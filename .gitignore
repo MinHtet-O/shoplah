@@ -1,0 +1,18 @@
+# Dependencies
+frontend/node_modules/
+backend/node_modules/
+node_modules
+.next
+
+# Environment variables
+frontend/.env
+backend/.env
+
+# Temporary files
+frontend/tmp/
+frontend/temp/
+backend/tmp/
+backend/temp/
+
+# OS generated files
+.DS_Store
