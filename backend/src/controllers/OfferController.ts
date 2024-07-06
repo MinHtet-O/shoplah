@@ -2,8 +2,6 @@ import {
   JsonController,
   Get,
   Post,
-  Put,
-  Delete,
   Param,
   Body,
   CurrentUser,
@@ -12,7 +10,7 @@ import {
 import { Service } from "typedi";
 import { OfferService } from "../services/OfferService";
 import { User } from "../entity/User";
-import { OfferCreationDto } from "../dtos/OfferCreationDto";
+import { OfferCreationDto } from "../dtos/OfferCreationDto"; // Import the correct path
 import { Offer } from "../entity/Offer";
 
 @JsonController("/offers")

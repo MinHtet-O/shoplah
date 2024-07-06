@@ -9,7 +9,7 @@ import {
   ForbiddenError,
 } from "routing-controllers";
 import { AppDataSource } from "../data-source";
-import { OfferCreationDto } from "../dtos/OfferCreationDto";
+import { OfferCreationDto } from "../dtos/OfferCreationDto"; // Import the DTO
 
 @Service()
 export class OfferService {
@@ -42,8 +42,29 @@ export class OfferService {
     }
 
     if (item.status !== ItemStatus.AVAILABLE) {
+      throw new BadRequestError("Oops! Seems, the item is already sold");
+    }
+
+    if (item.seller_id === userId) {
+      throw new BadRequestError("You cannot send an offer for your own item");
+    }
+
+    if (data.price > item.price) {
       throw new BadRequestError(
-        "Cannot create an offer on an item that is not available"
+        "Offer price cannot be higher than the original item price"
+      );
+    }
+
+    const existingOffer = await this.offerRepository.findOne({
+      where: {
+        item_id: data.item_id,
+        user_id: userId,
+        price: data.price,
+      },
+    });
+    if (existingOffer) {
+      throw new BadRequestError(
+        "You have already made an offer with the same price for this item"
       );
     }
 
