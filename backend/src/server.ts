@@ -5,10 +5,9 @@ import { ItemController } from "./controllers/ItemController";
 import { AppDataSource } from "./data-source";
 import { UserController } from "./controllers/UserController";
 import { ErrorHandler } from "./middleware/errorHandler";
-import { authChecker } from "./middleware/authChecker";
+import { authChecker, currentUserChecker } from "./middleware/authChecker"; // Import the authChecker and currentUserChecker
 import { AuthController } from "./controllers/AuthController";
 
-// Set up the container
 useContainer(Container);
 
 async function startServer() {
@@ -20,6 +19,7 @@ async function startServer() {
       defaultErrorHandler: false,
       middlewares: [ErrorHandler],
       authorizationChecker: authChecker,
+      currentUserChecker: currentUserChecker,
     });
 
     const port = process.env.PORT || 8080;

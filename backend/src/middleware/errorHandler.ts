@@ -14,6 +14,7 @@ interface FormattedValidationErrors {
 @Service()
 export class ErrorHandler implements ExpressErrorMiddlewareInterface {
   error(error: any, request: any, response: any, next: (err: any) => any) {
+    console.error(error);
     let statusCode = 500;
     let message = "Internal Server Error";
     let errors: FormattedValidationErrors | undefined = undefined;
