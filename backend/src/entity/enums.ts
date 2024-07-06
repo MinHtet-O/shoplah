@@ -8,3 +8,8 @@ export enum OfferStatus {
   ACCEPTED = "accepted",
   REJECTED = "rejected",
 }
+
+export enum PurchaseType {
+  DIRECT_PURCHASE = "direct_purchase",
+  OFFER_ACCEPTED = "offer_accepted",
+}

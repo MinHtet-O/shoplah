@@ -7,6 +7,7 @@ import {
 } from "typeorm";
 import { Item } from "./Item";
 import { Offer } from "./Offer";
+import { Purchase } from "./Purchase";
 
 @Entity("users")
 export class User {
@@ -28,6 +29,12 @@ export class User {
   @OneToMany(() => Item, (item) => item.seller)
   items: Item[];
 
-  @OneToMany(() => Offer, (offer: Offer) => offer.user)
+  @OneToMany(() => Offer, (offer) => offer.user)
   offers: Offer[];
+
+  @OneToMany(() => Purchase, (purchase) => purchase.buyer)
+  purchases: Purchase[];
+
+  @OneToMany(() => Purchase, (purchase) => purchase.seller)
+  sales: Purchase[];
 }

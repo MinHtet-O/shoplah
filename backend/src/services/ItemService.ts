@@ -3,7 +3,7 @@ import { Not, Repository } from "typeorm";
 import { Item } from "../entity/Item";
 import { Offer } from "../entity/Offer";
 import { Category } from "../entity/Category";
-import { ItemStatus, OfferStatus } from "../entity/enums";
+import { ItemStatus, OfferStatus, PurchaseType } from "../entity/enums";
 import {
   NotFoundError,
   BadRequestError,
@@ -13,6 +13,7 @@ import { AppDataSource } from "../data-source";
 import { excludeFields } from "../utils/queryUtils";
 import { User } from "../entity/User";
 import { ItemCreationDto } from "../dtos/ItemCreationDto";
+import { Purchase } from "../entity/Purchase";
 
 @Service()
 export class ItemService {
@@ -161,11 +162,19 @@ export class ItemService {
         throw new BadRequestError("This offer is no longer pending");
       }
 
-      // Update item status
+      const purchase = new Purchase();
+      purchase.item_id = itemId;
+      purchase.buyer_id = acceptedOffer.user_id;
+      purchase.seller_id = item.seller_id;
+      purchase.price = acceptedOffer.price;
+      purchase.type = PurchaseType.OFFER_ACCEPTED;
+      purchase.purchased_at = new Date();
+      await transactionalEntityManager.save(purchase);
+
       item.status = ItemStatus.SOLD;
+      item.purchase = purchase;
       await transactionalEntityManager.save(item);
 
-      // Update accepted offer
       acceptedOffer.status = OfferStatus.ACCEPTED;
       await transactionalEntityManager.save(acceptedOffer);
 
@@ -184,18 +193,30 @@ export class ItemService {
     return AppDataSource.transaction(async (transactionalEntityManager) => {
       const item = await transactionalEntityManager.findOne(Item, {
         where: { id: itemId },
+        relations: ["purchase"],
       });
+
       if (!item) {
         throw new NotFoundError("Item not found");
       }
-      if (item.status !== ItemStatus.AVAILABLE) {
+      if (item.status !== ItemStatus.AVAILABLE || item.purchase) {
         throw new ForbiddenError("Item is not available for purchase");
       }
       if (item.seller_id === buyerId) {
         throw new ForbiddenError("You cannot buy your own item");
       }
 
+      const purchase = new Purchase();
+      purchase.item_id = itemId;
+      purchase.buyer_id = buyerId;
+      purchase.seller_id = item.seller_id;
+      purchase.price = item.price;
+      purchase.type = PurchaseType.DIRECT_PURCHASE;
+      purchase.purchased_at = new Date();
+      await transactionalEntityManager.save(purchase);
+
       item.status = ItemStatus.SOLD;
+      item.purchase = purchase;
       await transactionalEntityManager.save(item);
 
       await transactionalEntityManager.update(

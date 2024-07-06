@@ -21,6 +21,7 @@ export class UserService {
     const userMetadata = this.userRepository.metadata;
     const user = await this.userRepository.findOne({
       where: { id },
+      relations: ["purchases", "sales", "offers"],
       select: excludeFields(userMetadata, ["password_hash", "created_at"]),
     });
 

@@ -3,6 +3,7 @@ import {
   PrimaryGeneratedColumn,
   Column,
   ManyToOne,
+  OneToOne,
   OneToMany,
   CreateDateColumn,
   UpdateDateColumn,
@@ -10,8 +11,9 @@ import {
 } from "typeorm";
 import { User } from "./User";
 import { Category } from "./Category";
-import { Offer } from "./Offer";
 import { ItemStatus } from "./enums";
+import { Offer } from "./Offer";
+import { Purchase } from "./Purchase";
 
 @Entity("items")
 export class Item {
@@ -56,4 +58,7 @@ export class Item {
 
   @OneToMany(() => Offer, (offer) => offer.item)
   offers: Offer[];
+
+  @OneToOne(() => Purchase, (purchase) => purchase.item)
+  purchase: Purchase;
 }
