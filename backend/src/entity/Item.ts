@@ -3,12 +3,14 @@ import {
   PrimaryGeneratedColumn,
   Column,
   ManyToOne,
+  OneToMany,
   CreateDateColumn,
   UpdateDateColumn,
   JoinColumn,
 } from "typeorm";
 import { User } from "./User";
 import { Category } from "./Category";
+import { Offer } from "./Offer";
 import { ItemStatus } from "./enums";
 
 @Entity("items")
@@ -51,4 +53,7 @@ export class Item {
 
   @UpdateDateColumn()
   updated_at: Date;
+
+  @OneToMany(() => Offer, (offer) => offer.item)
+  offers: Offer[];
 }

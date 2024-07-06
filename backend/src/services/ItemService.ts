@@ -40,7 +40,7 @@ export class ItemService {
 
     const item = await this.itemRepository.findOne({
       where: { id },
-      relations: ["category", "seller"],
+      relations: ["category", "seller", "offers"],
       select: {
         ...excludeFields(itemMetadata, []),
         category: excludeFields(categoryMetadata, []),

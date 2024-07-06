@@ -5,6 +5,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   ManyToOne,
+  JoinColumn,
 } from "typeorm";
 import { User } from "./User";
 import { Item } from "./Item";
@@ -18,13 +19,15 @@ export class Offer {
   @Column()
   item_id: number;
 
-  @ManyToOne(() => Item, (item) => item.id)
+  @ManyToOne(() => Item, (item) => item.offers)
+  @JoinColumn({ name: "item_id" })
   item: Item;
 
   @Column()
   user_id: number;
 
   @ManyToOne(() => User, (user) => user.offers)
+  @JoinColumn({ name: "user_id" })
   user: User;
 
   @Column("integer")
