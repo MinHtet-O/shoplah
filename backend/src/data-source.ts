@@ -3,6 +3,7 @@ import { PostgresConnectionOptions } from "typeorm/driver/postgres/PostgresConne
 import { Item } from "./entity/Item";
 import { User } from "./entity/User";
 import { Offer } from "./entity/Offer";
+import { Category } from "./entity/Category";
 
 const commonConfig: PostgresConnectionOptions = {
   type: "postgres",
@@ -11,9 +12,7 @@ const commonConfig: PostgresConnectionOptions = {
   username: process.env.DB_USERNAME || "postgres",
   password: process.env.DB_PASSWORD || "postgres",
   database: process.env.DB_NAME || "shoplah",
-  entities: [Item, User, Offer],
-  migrations: ["src/migration/**/*.ts"],
-  subscribers: ["src/subscriber/**/*.ts"],
+  entities: [Item, User, Offer, Category],
 };
 
 const developmentConfig: PostgresConnectionOptions = {

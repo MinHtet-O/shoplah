@@ -18,7 +18,7 @@ export class Offer {
   @Column()
   item_id: number;
 
-  @ManyToOne(() => Item, (item) => item.offers)
+  @ManyToOne(() => Item, (item) => item.id)
   item: Item;
 
   @Column()

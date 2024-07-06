@@ -2,13 +2,13 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
+  ManyToOne,
   CreateDateColumn,
   UpdateDateColumn,
-  ManyToOne,
-  OneToMany,
+  JoinColumn,
 } from "typeorm";
 import { User } from "./User";
-import { Offer } from "./Offer";
+import { Category } from "./Category";
 import { ItemStatus } from "./enums";
 
 @Entity("items")
@@ -20,7 +20,15 @@ export class Item {
   seller_id: number;
 
   @ManyToOne(() => User, (user) => user.items)
+  @JoinColumn({ name: "seller_id" })
   seller: User;
+
+  @Column()
+  category_id: number;
+
+  @ManyToOne(() => Category, (category) => category.items)
+  @JoinColumn({ name: "category_id" })
+  category: Category;
 
   @Column({ type: "varchar", length: 255 })
   title: string;
@@ -28,7 +36,7 @@ export class Item {
   @Column("text")
   description: string;
 
-  @Column("integer")
+  @Column("int")
   price: number;
 
   @Column({
@@ -43,7 +51,4 @@ export class Item {
 
   @UpdateDateColumn()
   updated_at: Date;
-
-  @OneToMany(() => Offer, (offer) => offer.item)
-  offers: Offer[];
 }
