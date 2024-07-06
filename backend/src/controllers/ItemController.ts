@@ -6,52 +6,41 @@ import {
   Delete,
   Body,
   Param,
-  HttpCode,
-  NotFoundError,
 } from "routing-controllers";
-import { AppDataSource } from "../data-source";
+import { ItemService } from "../services/ItemService";
 import { Item } from "../entity/Item";
 
 @JsonController("/items")
 export class ItemController {
-  private itemRepository = AppDataSource.getRepository(Item);
+  constructor(private itemService: ItemService) {}
 
-  @Get("/")
-  async getAll() {
-    return this.itemRepository.find();
+  @Get()
+  getAll() {
+    return this.itemService.findAll();
   }
 
   @Get("/:id")
-  async getOne(@Param("id") id: number) {
-    const item = await this.itemRepository.findOne({ where: { id } });
-    if (!item) {
-      throw new NotFoundError(`Item with id ${id} not found`);
-    }
-    return item;
+  getOne(@Param("id") id: number) {
+    return this.itemService.findOne(id);
   }
 
-  @Post("/")
-  @HttpCode(201)
-  async create(@Body() item: Item) {
-    return this.itemRepository.save(item);
+  @Post()
+  create(@Body() item: Item) {
+    return this.itemService.create(item);
   }
 
   @Put("/:id")
-  async update(@Param("id") id: number, @Body() item: Item) {
-    const existingItem = await this.itemRepository.findOne({ where: { id } });
-    if (!existingItem) {
-      throw new NotFoundError(`Item with id ${id} not found`);
-    }
-    await this.itemRepository.update(id, item);
-    return this.itemRepository.findOne({ where: { id } });
+  update(@Param("id") id: number, @Body() item: Item) {
+    return this.itemService.update(id, item);
   }
 
   @Delete("/:id")
-  @HttpCode(204)
-  async delete(@Param("id") id: number) {
-    const result = await this.itemRepository.delete(id);
-    if (result.affected === 0) {
-      throw new NotFoundError(`Item with id ${id} not found`);
-    }
+  delete(@Param("id") id: number) {
+    return this.itemService.delete(id);
+  }
+
+  @Post("/:id/buy")
+  buyItem(@Param("id") id: number, @Body() buyerData: { buyerId: number }) {
+    return this.itemService.buyItem(id, buyerData.buyerId);
   }
 }

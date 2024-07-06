@@ -33,29 +33,29 @@ async function createDatabaseIfNotExists() {
   }
 }
 
-async function seedDatabase() {
-  const itemRepository = AppDataSource.getRepository(Item);
+// async function seedDatabase() {
+//   const itemRepository = AppDataSource.getRepository(Item);
 
-  const itemCount = await itemRepository.count();
+//   const itemCount = await itemRepository.count();
 
-  if (itemCount === 0) {
-    const items = [{ name: "Item 1" }, { name: "Item 2" }, { name: "Item 3" }];
+//   if (itemCount === 0) {
+//     const items = [{ name: "Item 1" }, { name: "Item 2" }, { name: "Item 3" }];
 
-    for (const item of items) {
-      await itemRepository.save(item);
-    }
+//     for (const item of items) {
+//       await itemRepository.save(item);
+//     }
 
-    console.log("Database seeded with initial items.");
-  } else {
-    console.log("Database already has items, skipping seed.");
-  }
-}
+//     console.log("Database seeded with initial items.");
+//   } else {
+//     console.log("Database already has items, skipping seed.");
+//   }
+// }
 
 async function devSetup() {
   try {
     await createDatabaseIfNotExists();
     await AppDataSource.initialize();
-    await seedDatabase();
+    //await seedDatabase();
     console.log("Development setup completed successfully.");
   } catch (error) {
     console.error("Error during development setup:", error);

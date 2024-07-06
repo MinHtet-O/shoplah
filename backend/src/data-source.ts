@@ -1,6 +1,8 @@
 import { DataSource, DataSourceOptions } from "typeorm";
 import { PostgresConnectionOptions } from "typeorm/driver/postgres/PostgresConnectionOptions";
 import { Item } from "./entity/Item";
+import { User } from "./entity/User";
+import { Offer } from "./entity/Offer";
 
 const commonConfig: PostgresConnectionOptions = {
   type: "postgres",
@@ -9,7 +11,7 @@ const commonConfig: PostgresConnectionOptions = {
   username: process.env.DB_USERNAME || "postgres",
   password: process.env.DB_PASSWORD || "postgres",
   database: process.env.DB_NAME || "shoplah",
-  entities: [Item],
+  entities: [Item, User, Offer],
   migrations: ["src/migration/**/*.ts"],
   subscribers: ["src/subscriber/**/*.ts"],
 };
