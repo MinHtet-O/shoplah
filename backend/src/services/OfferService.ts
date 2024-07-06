@@ -1,70 +1,87 @@
 import { Service } from "typedi";
-import { AppDataSource } from "../data-source";
+import { Repository } from "typeorm";
 import { Offer } from "../entity/Offer";
 import { Item } from "../entity/Item";
 import { OfferStatus, ItemStatus } from "../entity/enums";
-import { Not } from "typeorm";
+import {
+  NotFoundError,
+  BadRequestError,
+  ForbiddenError,
+} from "routing-controllers";
+import { AppDataSource } from "../data-source";
+import { OfferCreationDto } from "../dtos/OfferCreationDto";
 
 @Service()
 export class OfferService {
-  private offerRepository = AppDataSource.getRepository(Offer);
-  private itemRepository = AppDataSource.getRepository(Item);
+  private offerRepository: Repository<Offer>;
+  private itemRepository: Repository<Item>;
 
-  async findAll(): Promise<Offer[]> {
+  constructor() {
+    this.offerRepository = AppDataSource.getRepository(Offer);
+    this.itemRepository = AppDataSource.getRepository(Item);
+  }
+
+  async getAll(): Promise<Offer[]> {
     return this.offerRepository.find();
   }
 
-  async findOne(id: number): Promise<Offer | null> {
-    return this.offerRepository.findOne({ where: { id } });
-  }
-
-  async create(offer: Offer): Promise<Offer> {
-    return this.offerRepository.save(offer);
-  }
-
-  async acceptOffer(offerId: number): Promise<Offer> {
-    return AppDataSource.transaction(async (transactionalEntityManager) => {
-      const offer = await transactionalEntityManager.findOne(Offer, {
-        where: { id: offerId },
-        relations: ["item"],
-      });
-      if (!offer) {
-        throw new Error("Offer not found");
-      }
-      if (offer.status !== OfferStatus.PENDING) {
-        throw new Error("Offer is not in a pending state");
-      }
-
-      offer.status = OfferStatus.ACCEPTED;
-      await transactionalEntityManager.save(offer);
-
-      // Update item status
-      offer.item.status = ItemStatus.SOLD;
-      await transactionalEntityManager.save(offer.item);
-
-      // Reject all other pending offers for this item
-      await transactionalEntityManager.update(
-        Offer,
-        {
-          item: { id: offer.item.id },
-          status: OfferStatus.PENDING,
-          id: Not(offerId),
-        },
-        { status: OfferStatus.REJECTED }
-      );
-
-      return offer;
-    });
-  }
-
-  async rejectOffer(offerId: number): Promise<Offer> {
-    const offer = await this.offerRepository.findOne({
-      where: { id: offerId },
-    });
+  async getOne(id: number): Promise<Offer> {
+    const offer = await this.offerRepository.findOne({ where: { id } });
     if (!offer) {
-      throw new Error("Offer not found");
+      throw new NotFoundError("Offer not found");
     }
-    offer.status = OfferStatus.REJECTED;
+    return offer;
+  }
+
+  async create(data: OfferCreationDto, userId: number): Promise<Offer> {
+    const item = await this.itemRepository.findOne({
+      where: { id: data.item_id },
+    });
+    if (!item) {
+      throw new BadRequestError("Invalid item");
+    }
+
+    if (item.status !== ItemStatus.AVAILABLE) {
+      throw new BadRequestError(
+        "Cannot create an offer on an item that is not available"
+      );
+    }
+
+    const newOffer = this.offerRepository.create({
+      ...data,
+      user_id: userId,
+      status: OfferStatus.PENDING,
+      item: item,
+    });
+
+    return this.offerRepository.save(newOffer);
+  }
+
+  async update(
+    id: number,
+    data: Partial<Offer>,
+    userId: number
+  ): Promise<Offer> {
+    const offer = await this.getOne(id);
+    if (offer.user_id !== userId) {
+      throw new ForbiddenError("Only the owner can edit this offer");
+    }
+
+    Object.assign(offer, data);
     return this.offerRepository.save(offer);
+  }
+
+  async delete(id: number, userId: number): Promise<boolean> {
+    const offer = await this.getOne(id);
+    if (offer.user_id !== userId) {
+      throw new ForbiddenError("Only the owner can delete this offer");
+    }
+
+    const result = await this.offerRepository.delete(id);
+    return (
+      result.affected !== undefined &&
+      result.affected !== null &&
+      result.affected > 0
+    );
   }
 }

@@ -7,6 +7,7 @@ import { UserController } from "./controllers/UserController";
 import { ErrorHandler } from "./middleware/errorHandler";
 import { authChecker, currentUserChecker } from "./middleware/authChecker"; // Import the authChecker and currentUserChecker
 import { AuthController } from "./controllers/AuthController";
+import { OfferController } from "./controllers/OfferController";
 
 useContainer(Container);
 
@@ -15,7 +16,12 @@ async function startServer() {
     await AppDataSource.initialize();
 
     const app = createExpressServer({
-      controllers: [ItemController, UserController, AuthController],
+      controllers: [
+        ItemController,
+        UserController,
+        AuthController,
+        OfferController,
+      ],
       defaultErrorHandler: false,
       middlewares: [ErrorHandler],
       authorizationChecker: authChecker,
