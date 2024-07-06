@@ -12,6 +12,7 @@ import {
 import { AppDataSource } from "../data-source";
 import { excludeFields } from "../utils/queryUtils";
 import { User } from "../entity/User";
+import { ItemCreationDto } from "../dtos/ItemCreationDto";
 
 @Service()
 export class ItemService {
@@ -55,7 +56,8 @@ export class ItemService {
     return item;
   }
 
-  async create(data: Partial<Item>, userId: number): Promise<Item> {
+  async create(data: ItemCreationDto, userId: number): Promise<Item> {
+    // Use the DTO type
     const existingItem = await this.itemRepository.findOne({
       where: { title: data.title, seller_id: userId },
     });

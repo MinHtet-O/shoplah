@@ -8,11 +8,13 @@ import {
   Body,
   QueryParams,
   CurrentUser,
+  Authorized,
 } from "routing-controllers";
 import { Service } from "typedi";
 import { ItemService } from "../services/ItemService";
-import { Item } from "../entity/Item";
 import { User } from "../entity/User";
+import { ItemCreationDto } from "../dtos/ItemCreationDto";
+import { Item } from "../entity/Item";
 
 @JsonController("/items")
 @Service()
@@ -29,10 +31,9 @@ export class ItemController {
     return this.itemService.getOne(id);
   }
 
-  // Other methods remain the same
-
+  @Authorized()
   @Post()
-  create(@Body() item: Partial<Item>, @CurrentUser() user: User) {
+  create(@Body() item: ItemCreationDto, @CurrentUser() user: User) {
     return this.itemService.create(item, user.id);
   }
 
