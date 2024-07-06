@@ -1,37 +1,125 @@
 import { Service } from "typedi";
-import { AppDataSource } from "../data-source";
+import { Repository } from "typeorm";
 import { Item } from "../entity/Item";
 import { Offer } from "../entity/Offer";
+import { Category } from "../entity/Category";
 import { ItemStatus, OfferStatus } from "../entity/enums";
-import { DeleteResult } from "typeorm";
+import {
+  NotFoundError,
+  BadRequestError,
+  ForbiddenError,
+} from "routing-controllers";
+import { AppDataSource } from "../data-source";
+import { excludeFields } from "../utils/queryUtils";
+import { User } from "../entity/User";
 
 @Service()
 export class ItemService {
-  private itemRepository = AppDataSource.getRepository(Item);
-  private offerRepository = AppDataSource.getRepository(Offer);
+  private itemRepository: Repository<Item>;
+  private offerRepository: Repository<Offer>;
+  private categoryRepository: Repository<Category>;
+  private userRepository: Repository<User>;
 
-  async findAll(): Promise<Item[]> {
-    return this.itemRepository.find();
+  constructor() {
+    this.itemRepository = AppDataSource.getRepository(Item);
+    this.offerRepository = AppDataSource.getRepository(Offer);
+    this.categoryRepository = AppDataSource.getRepository(Category);
+    this.userRepository = AppDataSource.getRepository(User);
   }
 
-  async findOne(id: number): Promise<Item | null> {
-    return this.itemRepository.findOne({ where: { id } });
+  async getAll(filters: Partial<Item> = {}): Promise<Item[]> {
+    return this.itemRepository.find({
+      where: filters,
+    });
   }
 
-  async create(item: Item): Promise<Item> {
+  async getOne(id: number): Promise<Partial<Item>> {
+    const itemMetadata = this.itemRepository.metadata;
+    const userMetadata = this.userRepository.metadata;
+    const categoryMetadata = this.categoryRepository.metadata;
+
+    const item = await this.itemRepository.findOne({
+      where: { id },
+      relations: ["category", "seller"],
+      select: {
+        ...excludeFields(itemMetadata, []),
+        category: excludeFields(categoryMetadata, []),
+        seller: excludeFields(userMetadata, ["password_hash", "created_at"]),
+      },
+    });
+
+    if (!item) {
+      throw new NotFoundError("Item not found");
+    }
+
+    return item;
+  }
+
+  async create(data: Partial<Item>, userId: number): Promise<Item> {
+    const existingItem = await this.itemRepository.findOne({
+      where: { title: data.title, seller_id: userId },
+    });
+    if (existingItem) {
+      throw new BadRequestError(
+        "An item with this title already exists for this seller"
+      );
+    }
+
+    const category = await this.categoryRepository.findOne({
+      where: { id: data.category_id },
+    });
+    if (!category) {
+      throw new BadRequestError("Invalid category");
+    }
+
+    const newItem = this.itemRepository.create({
+      ...data,
+      seller_id: userId,
+      status: ItemStatus.AVAILABLE,
+      category: category,
+    });
+    return this.itemRepository.save(newItem);
+  }
+
+  async update(id: number, data: Partial<Item>, userId: number): Promise<Item> {
+    const item = await this.getOne(id);
+    if (item.seller_id !== userId) {
+      throw new ForbiddenError("Only the owner can edit this item");
+    }
+    if (item.status !== ItemStatus.AVAILABLE) {
+      throw new ForbiddenError("This item can no longer be edited");
+    }
+
+    if (data.category_id) {
+      const category = await this.categoryRepository.findOne({
+        where: { id: data.category_id },
+      });
+      if (!category) {
+        throw new BadRequestError("Invalid category");
+      }
+      item.category = category;
+    }
+
+    Object.assign(item, data);
     return this.itemRepository.save(item);
   }
 
-  async update(id: number, itemData: Partial<Item>): Promise<Item | null> {
-    await this.itemRepository.update(id, itemData);
-    return this.itemRepository.findOne({ where: { id } });
-  }
+  async delete(id: number, userId: number): Promise<boolean> {
+    const item = await this.itemRepository.findOne({ where: { id } });
+    if (!item) {
+      throw new NotFoundError("Item not found");
+    }
+    if (item.seller_id !== userId) {
+      throw new ForbiddenError("Only the owner can delete this item");
+    }
+    if (item.status !== ItemStatus.AVAILABLE) {
+      throw new ForbiddenError("This item can no longer be deleted");
+    }
 
-  async delete(id: number): Promise<boolean> {
-    const result: DeleteResult = await this.itemRepository.delete(id);
+    const result = await this.itemRepository.delete(id);
     return (
-      result.affected !== null &&
       result.affected !== undefined &&
+      result.affected !== null &&
       result.affected > 0
     );
   }
@@ -42,16 +130,18 @@ export class ItemService {
         where: { id: itemId },
       });
       if (!item) {
-        throw new Error("Item not found");
+        throw new NotFoundError("Item not found");
       }
       if (item.status !== ItemStatus.AVAILABLE) {
-        throw new Error("Item is not available for purchase");
+        throw new ForbiddenError("Item is not available for purchase");
+      }
+      if (item.seller_id === buyerId) {
+        throw new ForbiddenError("You cannot buy your own item");
       }
 
       item.status = ItemStatus.SOLD;
       await transactionalEntityManager.save(item);
 
-      // Reject all pending offers
       await transactionalEntityManager.update(
         Offer,
         { item: { id: itemId }, status: OfferStatus.PENDING },

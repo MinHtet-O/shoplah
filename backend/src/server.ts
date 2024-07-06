@@ -1,7 +1,11 @@
 import "reflect-metadata";
-import { createExpressServer } from "routing-controllers";
+import { createExpressServer, useContainer } from "routing-controllers";
+import { Container } from "typedi";
 import { ItemController } from "./controllers/ItemController";
 import { AppDataSource } from "./data-source";
+
+// Set up the container
+useContainer(Container);
 
 async function startServer() {
   try {
@@ -9,6 +13,7 @@ async function startServer() {
 
     const app = createExpressServer({
       controllers: [ItemController],
+      defaultErrorHandler: false,
     });
 
     const port = process.env.PORT || 8080;
