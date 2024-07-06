@@ -15,6 +15,8 @@ import { ItemService } from "../services/ItemService";
 import { User } from "../entity/User";
 import { ItemCreationDto } from "../dtos/ItemCreationDto";
 import { Item } from "../entity/Item";
+import { AcceptOfferDto } from "../dtos/AcceptOfferDto";
+import { BuyItemDto } from "../dtos/BuyItemDto";
 
 @JsonController("/items")
 @Service()
@@ -51,8 +53,22 @@ export class ItemController {
     return this.itemService.delete(id, user.id);
   }
 
-  @Post("/:id/buy")
-  buyItem(@Param("id") id: number, @CurrentUser() user: User) {
-    return this.itemService.buyItem(id, user.id);
+  @Post("/buy")
+  @Authorized()
+  async buyItem(@Body() buyItemDto: BuyItemDto, @CurrentUser() user: User) {
+    return this.itemService.buyItem(buyItemDto.itemId, user.id);
+  }
+
+  @Post("/accept-offer")
+  @Authorized()
+  async acceptOffer(
+    @Body() acceptOfferDto: AcceptOfferDto,
+    @CurrentUser() user: User
+  ) {
+    return this.itemService.acceptOffer(
+      acceptOfferDto.itemId,
+      acceptOfferDto.offerId,
+      user.id
+    );
   }
 }

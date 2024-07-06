@@ -1,5 +1,5 @@
 import { Service } from "typedi";
-import { Repository } from "typeorm";
+import { Not, Repository } from "typeorm";
 import { Item } from "../entity/Item";
 import { Offer } from "../entity/Offer";
 import { Category } from "../entity/Category";
@@ -124,6 +124,60 @@ export class ItemService {
       result.affected !== null &&
       result.affected > 0
     );
+  }
+
+  async acceptOffer(
+    itemId: number,
+    offerId: number,
+    userId: number
+  ): Promise<Item> {
+    return AppDataSource.transaction(async (transactionalEntityManager) => {
+      const item = await transactionalEntityManager.findOne(Item, {
+        where: { id: itemId },
+        relations: ["offers"],
+      });
+
+      if (!item) {
+        throw new NotFoundError("Item not found");
+      }
+
+      if (item.seller_id !== userId) {
+        throw new ForbiddenError(
+          "Only the seller can accept offers for this item"
+        );
+      }
+
+      if (item.status !== ItemStatus.AVAILABLE) {
+        throw new BadRequestError("Item is not available for sale");
+      }
+
+      const acceptedOffer = item.offers.find((offer) => offer.id === offerId);
+
+      if (!acceptedOffer) {
+        throw new NotFoundError("Offer not found for this item");
+      }
+
+      if (acceptedOffer.status !== OfferStatus.PENDING) {
+        throw new BadRequestError("This offer is no longer pending");
+      }
+
+      // Update item status
+      item.status = ItemStatus.SOLD;
+      await transactionalEntityManager.save(item);
+
+      // Update accepted offer
+      acceptedOffer.status = OfferStatus.ACCEPTED;
+      await transactionalEntityManager.save(acceptedOffer);
+
+      // Reject all other offers
+      await transactionalEntityManager.update(
+        Offer,
+        { item: { id: itemId }, status: OfferStatus.PENDING, id: Not(offerId) },
+        { status: OfferStatus.REJECTED }
+      );
+
+      return item;
+    });
   }
 
   async buyItem(itemId: number, buyerId: number): Promise<Item> {
