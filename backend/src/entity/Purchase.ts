@@ -37,18 +37,12 @@ export class Purchase {
   @JoinColumn({ name: "seller_id" })
   seller: User;
 
-  @Column("int")
-  price: number;
-
   @Column({
     type: "enum",
     enum: PurchaseType,
     default: PurchaseType.DIRECT_PURCHASE,
   })
   type: PurchaseType;
-
-  @CreateDateColumn()
-  created_at: Date;
 
   @Column({ type: "timestamp" })
   purchased_at: Date;

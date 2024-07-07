@@ -4,6 +4,7 @@ import { Item } from "./entity/Item";
 import { User } from "./entity/User";
 import { Offer } from "./entity/Offer";
 import { Category } from "./entity/Category";
+import { Purchase } from "./entity/Purchase";
 
 const commonConfig: PostgresConnectionOptions = {
   type: "postgres",
@@ -12,7 +13,7 @@ const commonConfig: PostgresConnectionOptions = {
   username: process.env.DB_USERNAME || "postgres",
   password: process.env.DB_PASSWORD || "postgres",
   database: process.env.DB_NAME || "shoplah",
-  entities: [Item, User, Offer, Category],
+  entities: [Item, User, Offer, Category, Purchase],
 };
 
 const developmentConfig: PostgresConnectionOptions = {
