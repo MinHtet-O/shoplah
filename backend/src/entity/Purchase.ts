@@ -37,6 +37,9 @@ export class Purchase {
   @JoinColumn({ name: "seller_id" })
   seller: User;
 
+  @Column("int")
+  price: number;
+
   @Column({
     type: "enum",
     enum: PurchaseType,
