@@ -7,7 +7,8 @@
     "dev": "NODE_ENV=development ts-node src/server.ts",
     "prod": "NODE_ENV=production ts-node src/server.ts",
     "setup:dev": "NODE_ENV=development ts-node src/scripts/setup-dev-env.ts",
-    "cleanup": "NODE_ENV=development ts-node src/scripts/cleanup-dev.ts"
+    "cleanup": "NODE_ENV=development ts-node src/scripts/cleanup-dev.ts",
+    "restart:dev": "npm run cleanup && npm run setup:dev"
   },
   "keywords": [],
   "author": "",

@@ -1,5 +1,3 @@
-import "reflect-metadata";
-import { DataSource } from "typeorm";
 import { User } from "../entity/User";
 import { Item } from "../entity/Item";
 import { Offer } from "../entity/Offer";
@@ -46,20 +44,3 @@ export const seedOffers = async () => {
   // Save offers to the database
   await offerRepository.save(offers);
 };
-
-const seed = async () => {
-  try {
-    await AppDataSource.initialize();
-    console.log("Data Source has been initialized!");
-
-    await seedOffers();
-    console.log("Offers have been seeded!");
-
-    await AppDataSource.destroy();
-    console.log("Data Source has been destroyed!");
-  } catch (err) {
-    console.error("Error during Data Source initialization", err);
-  }
-};
-
-seed();

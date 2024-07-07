@@ -38,15 +38,35 @@
 }
 
 .navbarBrand {
-  font-weight: bold;
+  display: flex;
+  align-items: center;
+}
+
+.navbarText {
   font-size: 1.5rem;
-  color: #667eea;
+  font-weight: bold;
+  margin-left: 0.5rem;
+}
+/* Add gradient background for the popular categories section */
+.popularCategoriesSection {
+  background: linear-gradient(to right, #d9a7c7, #fffcdc);
+  padding: 2rem 0;
+  border-radius: 8px;
 }
 
 .categoryItem {
-  transition: transform 0.3s ease;
+  background: rgba(
+    255,
+    255,
+    255,
+    0.8
+  ); /* Semi-transparent background for category items */
+  padding: 1.5rem;
+  border-radius: 8px;
+  color: #6e48aa; /* Matching text color */
+  transition: transform 0.3s;
 }
 
 .categoryItem:hover {
-  transform: translateY(-5px);
+  transform: scale(1.05);
 }
