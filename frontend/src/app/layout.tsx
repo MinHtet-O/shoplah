@@ -1,9 +1,14 @@
+// File: app/layout.tsx
+
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import "bulma/css/bulma.min.css";
-const inter = Inter({ subsets: ["latin"] });
 import "@fortawesome/fontawesome-free/css/all.min.css";
+import StoreProvider from "./StoreProvider";
+import AppLayout from "./AppLayout";
+
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -17,7 +22,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className}>
+        <StoreProvider>
+          <AppLayout>{children}</AppLayout>
+        </StoreProvider>
+      </body>
     </html>
   );
 }

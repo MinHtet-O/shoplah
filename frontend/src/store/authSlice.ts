@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios, { AxiosError } from "axios";
 import { JwtPayload, jwtDecode } from "jwt-decode";
+import { AppDispatch } from "./store";
 
 interface AuthResponse {
   token: string;
@@ -70,6 +71,7 @@ interface AuthState {
   isLoading: boolean;
   error: ErrorResponse | null;
   userId: number | null;
+  initializing: boolean; // New state for initialization
 }
 
 const initialState: AuthState = {
@@ -78,6 +80,7 @@ const initialState: AuthState = {
   isLoading: false,
   error: null,
   userId: null,
+  initializing: true, // Initializing state starts as true
 };
 
 const authSlice = createSlice({
@@ -89,9 +92,28 @@ const authSlice = createSlice({
       state.isAuthenticated = false;
       state.error = null;
       state.userId = null;
+      localStorage.removeItem("token");
     },
     clearAuthError: (state) => {
       state.error = null;
+    },
+    setAuthFromToken: (state, action) => {
+      state.token = action.payload.token;
+      state.isAuthenticated = true;
+      state.initializing = false; // Set initializing to false when done
+      try {
+        const decodedToken = jwtDecode<DecodedToken>(action.payload.token);
+        state.userId = decodedToken.userId;
+      } catch (error) {
+        state.error = {
+          status: "error",
+          statusCode: 500,
+          message: "Failed to decode token",
+        };
+      }
+    },
+    finishInitializing: (state) => {
+      state.initializing = false; // Action to finish initializing
     },
   },
   extraReducers: (builder) => {
@@ -109,6 +131,7 @@ const authSlice = createSlice({
         try {
           const decodedToken = jwtDecode<DecodedToken>(action.payload.token);
           state.userId = decodedToken.userId;
+          localStorage.setItem("token", action.payload.token);
         } catch (error) {
           state.error = {
             status: "error",
@@ -144,5 +167,16 @@ const authSlice = createSlice({
   },
 });
 
-export const { logout, clearAuthError } = authSlice.actions;
+export const { logout, clearAuthError, setAuthFromToken, finishInitializing } =
+  authSlice.actions;
 export default authSlice.reducer;
+
+// Initialize auth state from localStorage token
+export const initializeAuth = () => (dispatch: AppDispatch) => {
+  const token = localStorage.getItem("token");
+  if (token) {
+    dispatch(setAuthFromToken({ token }));
+  } else {
+    dispatch(finishInitializing()); // Finish initializing if no token
+  }
+};

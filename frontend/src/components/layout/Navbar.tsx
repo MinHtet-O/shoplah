@@ -2,6 +2,8 @@
 import React from "react";
 import { useSelector, useDispatch } from "react-redux";
 import Image from "next/image";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import styles from "@/app/page.module.css";
 import logo from "../../../public/logo-icon.png";
 import { RootState } from "../../store/store";
@@ -16,60 +18,99 @@ interface NavbarProps {
 const Navbar: React.FC<NavbarProps> = ({ onLoginClick, onRegisterClick }) => {
   const { isAuthenticated } = useSelector((state: RootState) => state.auth);
   const dispatch = useDispatch<AppDispatch>();
+  const pathname = usePathname();
 
   const handleLogout = () => {
     dispatch(logout());
   };
 
+  const isActive = (path: string) => {
+    return pathname === path ? "is-primary" : "is-light";
+  };
+
   return (
-    <>
-      <nav
-        className="navbar is-white"
-        role="navigation"
-        aria-label="main navigation"
-      >
-        <div className="container">
-          <div className="navbar-brand p-0">
-            <a className={`navbar-item ${styles.navbarBrand}`} href="/">
-              <Image height={35} src={logo} alt="ShopLah Logo" />
-              <span className={`has-text-primary ${styles.navbarText}`}>
-                ShopLah
-              </span>
-            </a>
-          </div>
-          <div className="navbar-menu">
-            <div className="navbar-end">
-              <a className="navbar-item">Explore</a>
-              <a className="navbar-item">Sell</a>
-              <a className="navbar-item">About</a>
-              <a className="navbar-item">Contact</a>
+    <nav
+      className="navbar is-white"
+      role="navigation"
+      aria-label="main navigation"
+    >
+      <div className="container">
+        <div className="navbar-brand p-0">
+          <Link
+            href={isAuthenticated ? "/explorer" : "/"}
+            className={`navbar-item ${styles.navbarBrand}`}
+          >
+            <Image height={35} src={logo} alt="ShopLah Logo" />
+            <span className={`has-text-primary ${styles.navbarText}`}>
+              ShopLah
+            </span>
+          </Link>
+        </div>
+        <div className="navbar-menu">
+          <div className="navbar-start">
+            {isAuthenticated && (
               <div className="navbar-item">
                 <div className="buttons">
-                  {!isAuthenticated && (
-                    <>
-                      <a
-                        className="button is-primary"
-                        onClick={onRegisterClick}
-                      >
-                        Sign up
-                      </a>
-                      <a className="button is-light" onClick={onLoginClick}>
-                        Log in
-                      </a>
-                    </>
-                  )}
-                  {isAuthenticated && (
-                    <a className="button is-light" onClick={handleLogout}>
-                      Logout
-                    </a>
-                  )}
+                  <Link
+                    href="/explorer"
+                    className={`button ${isActive("/explorer")}`}
+                  >
+                    <span className="icon">
+                      <i className="fas fa-shopping-bag"></i>
+                    </span>
+                    <span>Shop</span>
+                  </Link>
+                  <Link
+                    href="/listings"
+                    className={`button ${isActive("/listings")}`}
+                  >
+                    <span className="icon">
+                      <i className="fas fa-store"></i>
+                    </span>
+                    <span>My Listings</span>
+                  </Link>
                 </div>
+              </div>
+            )}
+          </div>
+          <div className="navbar-end">
+            <div className="navbar-item">
+              <div className="buttons">
+                {!isAuthenticated && (
+                  <>
+                    <button
+                      className="button is-primary"
+                      onClick={onRegisterClick}
+                    >
+                      Sign up
+                    </button>
+                    <button className="button is-light" onClick={onLoginClick}>
+                      Log in
+                    </button>
+                  </>
+                )}
+                {isAuthenticated && (
+                  <>
+                    <Link href="/sell" className="button is-primary is-light">
+                      <span className="icon">
+                        <i className="fas fa-dollar-sign"></i>
+                      </span>
+                      <span>Sell</span>
+                    </Link>
+                    <button className="button is-light" onClick={handleLogout}>
+                      <span className="icon">
+                        <i className="fas fa-arrow-right-from-bracket"></i>
+                      </span>
+                      <span>Logout</span>
+                    </button>
+                  </>
+                )}
               </div>
             </div>
           </div>
         </div>
-      </nav>
-    </>
+      </div>
+    </nav>
   );
 };
 
