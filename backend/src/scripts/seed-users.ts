@@ -24,6 +24,11 @@ export async function seedUsers() {
         email: "user3@example.com",
         password_hash: await bcrypt.hash("password3", 10),
       },
+      {
+        username: "user4",
+        email: "user4@example.com",
+        password_hash: await bcrypt.hash("password4", 10),
+      },
     ];
 
     for (const user of users) {

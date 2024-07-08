@@ -1,4 +1,4 @@
-import { Action, UnauthorizedError } from "routing-controllers";
+import { Action } from "routing-controllers";
 import { verify } from "jsonwebtoken";
 import { User } from "../entity/User";
 import { AppDataSource } from "../data-source";
@@ -7,7 +7,7 @@ export async function authChecker(action: Action): Promise<boolean> {
   const token = action.request.headers["authorization"]?.split(" ")[1];
 
   if (!token) {
-    throw new UnauthorizedError("No token provided");
+    return true; // Allow access even if there's no token
   }
 
   try {
@@ -17,19 +17,18 @@ export async function authChecker(action: Action): Promise<boolean> {
     );
     const userRepository = AppDataSource.getRepository(User);
     if (!decoded.userId) {
-      throw new UnauthorizedError("Unauthorized User");
+      return true;
     }
     const user = await userRepository.findOne({
       where: { id: decoded.userId },
     });
 
-    if (!user) {
-      throw new UnauthorizedError("User not found");
+    if (user) {
+      (action.request as any).user = user; // Attach user to request
     }
-    (action.request as any).user = user; // Attach user to request
     return true;
   } catch (error) {
-    throw error;
+    return true; // Allow access even if token verification fails
   }
 }
 

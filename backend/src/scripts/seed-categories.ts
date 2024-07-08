@@ -11,6 +11,16 @@ export async function seedCategories() {
       { name: "Electronics" },
       { name: "Books" },
       { name: "Clothing" },
+      { name: "Tech" },
+      { name: "Computer" },
+      { name: "Kitchen" },
+      { name: "Arts" },
+      { name: "Toys" },
+      { name: "Beauty" },
+      { name: "Furniture" },
+      { name: "Mobile" },
+      { name: "Garden" },
+      { name: "Photography" },
     ];
 
     await categoryRepository.save(categories);

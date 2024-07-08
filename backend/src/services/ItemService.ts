@@ -1,5 +1,5 @@
 import { Service } from "typedi";
-import { Not, Repository } from "typeorm";
+import { FindManyOptions, FindOptionsWhere, Not, Repository } from "typeorm";
 import { Item } from "../entity/Item";
 import { Offer } from "../entity/Offer";
 import { Category } from "../entity/Category";
@@ -30,9 +30,20 @@ export class ItemService {
   }
 
   async getAll(filters: Partial<Item> = {}): Promise<Item[]> {
-    return this.itemRepository.find({
-      where: filters,
-    });
+    // Define the where object with a more flexible type
+    const where: { [key: string]: any } = {};
+
+    // Process filters to handle _ne (not equal) and other operators
+    for (const [key, value] of Object.entries(filters)) {
+      const [field, operator] = key.split("-");
+      if (operator === "ne") {
+        where[field] = Not(value);
+      } else {
+        where[key] = value;
+      }
+    }
+
+    return this.itemRepository.find({ where: where as any });
   }
 
   async getOne(id: number): Promise<Partial<Item>> {
@@ -58,7 +69,6 @@ export class ItemService {
   }
 
   async create(data: ItemCreationDto, userId: number): Promise<Item> {
-    // Use the DTO type
     const existingItem = await this.itemRepository.findOne({
       where: { title: data.title, seller_id: userId },
     });

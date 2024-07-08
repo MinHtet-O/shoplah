@@ -6,7 +6,7 @@ import { AppDispatch, RootState } from "../../store/store";
 interface RegisterModalProps {
   isActive: boolean;
   onClose: () => void;
-  onSwitchToLogin: () => void;
+  onSwitchToLogin: (message?: string) => void;
 }
 
 const RegisterModal: React.FC<RegisterModalProps> = ({
@@ -30,9 +30,24 @@ const RegisterModal: React.FC<RegisterModalProps> = ({
     }
   }, [isActive, dispatch]);
 
+  const handleSwitchToLogin = (message?: string) => {
+    // Clear local state
+    setUsername("");
+    setEmail("");
+    setPassword("");
+    dispatch(clearAuthError());
+    // Call the original onSwitchToLogin with the message
+    onSwitchToLogin(message);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    dispatch(register({ username, email, password }));
+    const resultAction = await dispatch(
+      register({ username, email, password })
+    );
+    if (register.fulfilled.match(resultAction)) {
+      handleSwitchToLogin("Successfully registered. Please log in.");
+    }
   };
 
   const handleClose = () => {
@@ -119,7 +134,8 @@ const RegisterModal: React.FC<RegisterModalProps> = ({
             </div>
           </form>
           <p className="mt-3">
-            Already have an account? <a onClick={onSwitchToLogin}>Login here</a>
+            Already have an account?{" "}
+            <a onClick={() => handleSwitchToLogin()}>Login here</a>
           </p>
         </div>
       </div>

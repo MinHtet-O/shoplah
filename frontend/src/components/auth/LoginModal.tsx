@@ -1,35 +1,64 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { login } from "../../store/authSlice";
+import { login, clearAuthError } from "../../store/authSlice";
 import { AppDispatch, RootState } from "../../store/store";
 
 interface LoginModalProps {
   isActive: boolean;
   onClose: () => void;
   onSwitchToRegister: () => void;
+  successMessage: string; // Add success message prop
 }
 
 const LoginModal: React.FC<LoginModalProps> = ({
   isActive,
   onClose,
   onSwitchToRegister,
+  successMessage, // Use success message
 }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const dispatch = useDispatch<AppDispatch>();
-  const { isLoading, error } = useSelector((state: RootState) => state.auth);
+  const { isLoading, error, isAuthenticated } = useSelector(
+    (state: RootState) => state.auth
+  );
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      onClose(); // Close the modal on successful login
+    }
+  }, [isAuthenticated, onClose]);
+
+  const handleSwitchToRegister = () => {
+    // Clear local state and success message
+    setEmail("");
+    setPassword("");
+    dispatch(clearAuthError());
+    // Call the original onSwitchToRegister
+    onSwitchToRegister();
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     dispatch(login({ email, password }));
   };
 
+  const handleClose = () => {
+    onClose();
+    setEmail("");
+    setPassword("");
+    dispatch(clearAuthError());
+  };
+
   return (
     <div className={`modal ${isActive ? "is-active" : ""}`}>
-      <div className="modal-background" onClick={onClose}></div>
+      <div className="modal-background" onClick={handleClose}></div>
       <div className="modal-content">
         <div className="box">
           <h2 className="title is-4">Login</h2>
+          {successMessage && (
+            <div className="notification is-success">{successMessage}</div>
+          )}
           <form onSubmit={handleSubmit}>
             <div className="field">
               <label className="label">Email</label>
@@ -83,14 +112,15 @@ const LoginModal: React.FC<LoginModalProps> = ({
             </div>
           </form>
           <p className="mt-3">
-            New to ShopLah? <a onClick={onSwitchToRegister}>Register here</a>
+            New to ShopLah?{" "}
+            <a onClick={handleSwitchToRegister}>Register here</a>
           </p>
         </div>
       </div>
       <button
         className="modal-close is-large"
         aria-label="close"
-        onClick={onClose}
+        onClick={handleClose}
       ></button>
     </div>
   );

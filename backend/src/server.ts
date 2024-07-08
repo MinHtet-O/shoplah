@@ -8,6 +8,9 @@ import { ErrorHandler } from "./middleware/errorHandler";
 import { authChecker, currentUserChecker } from "./middleware/authChecker"; // Import the authChecker and currentUserChecker
 import { AuthController } from "./controllers/AuthController";
 import { OfferController } from "./controllers/OfferController";
+import { Category } from "./entity/Category";
+import { CategoryController } from "./controllers/CategoryController";
+import { OptionalAuthMiddleware } from "./middleware/optionalAuth";
 
 useContainer(Container);
 
@@ -20,6 +23,7 @@ async function startServer() {
         ItemController,
         UserController,
         AuthController,
+        CategoryController,
         OfferController,
       ],
       defaultErrorHandler: false,

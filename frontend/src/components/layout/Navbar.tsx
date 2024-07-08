@@ -1,44 +1,24 @@
-import React, { useState } from "react";
+"use client";
+import React from "react";
 import { useSelector, useDispatch } from "react-redux";
 import Image from "next/image";
 import styles from "@/app/page.module.css";
 import logo from "../../../public/logo-icon.png";
-import LoginModal from "../auth/LoginModal";
-import RegisterModal from "../auth/RegisterModal";
 import { RootState } from "../../store/store";
-import { logout, clearAuthError } from "../../store/authSlice";
+import { logout } from "../../store/authSlice";
 import { AppDispatch } from "../../store/store";
 
-export default function Navbar() {
-  const [isLoginModalActive, setIsLoginModalActive] = useState(false);
-  const [isRegisterModalActive, setIsRegisterModalActive] = useState(false);
+interface NavbarProps {
+  onLoginClick: () => void;
+  onRegisterClick: () => void;
+}
+
+const Navbar: React.FC<NavbarProps> = ({ onLoginClick, onRegisterClick }) => {
   const { isAuthenticated } = useSelector((state: RootState) => state.auth);
   const dispatch = useDispatch<AppDispatch>();
 
   const handleLogout = () => {
     dispatch(logout());
-  };
-
-  const handleCloseLoginModal = () => {
-    setIsLoginModalActive(false);
-    dispatch(clearAuthError());
-  };
-
-  const handleCloseRegisterModal = () => {
-    setIsRegisterModalActive(false);
-    dispatch(clearAuthError());
-  };
-
-  const handleSwitchToRegister = () => {
-    setIsLoginModalActive(false);
-    setIsRegisterModalActive(true);
-    dispatch(clearAuthError());
-  };
-
-  const handleSwitchToLogin = () => {
-    setIsRegisterModalActive(false);
-    setIsLoginModalActive(true);
-    dispatch(clearAuthError());
   };
 
   return (
@@ -69,14 +49,11 @@ export default function Navbar() {
                     <>
                       <a
                         className="button is-primary"
-                        onClick={() => setIsRegisterModalActive(true)}
+                        onClick={onRegisterClick}
                       >
                         Sign up
                       </a>
-                      <a
-                        className="button is-light"
-                        onClick={() => setIsLoginModalActive(true)}
-                      >
+                      <a className="button is-light" onClick={onLoginClick}>
                         Log in
                       </a>
                     </>
@@ -92,16 +69,8 @@ export default function Navbar() {
           </div>
         </div>
       </nav>
-      <LoginModal
-        isActive={isLoginModalActive}
-        onClose={handleCloseLoginModal}
-        onSwitchToRegister={handleSwitchToRegister}
-      />
-      <RegisterModal
-        isActive={isRegisterModalActive}
-        onClose={handleCloseRegisterModal}
-        onSwitchToLogin={handleSwitchToLogin}
-      />
     </>
   );
-}
+};
+
+export default Navbar;

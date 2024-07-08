@@ -9,6 +9,7 @@ import {
   QueryParams,
   CurrentUser,
   Authorized,
+  UseBefore,
 } from "routing-controllers";
 import { Service } from "typedi";
 import { ItemService } from "../services/ItemService";
@@ -39,6 +40,7 @@ export class ItemController {
     return this.itemService.create(item, user.id);
   }
 
+  @Authorized()
   @Put("/:id")
   update(
     @Param("id") id: number,
@@ -48,19 +50,20 @@ export class ItemController {
     return this.itemService.update(id, item, user.id);
   }
 
+  @Authorized()
   @Delete("/:id")
   delete(@Param("id") id: number, @CurrentUser() user: User) {
     return this.itemService.delete(id, user.id);
   }
 
-  @Post("/buy")
   @Authorized()
+  @Post("/buy")
   async buyItem(@Body() buyItemDto: BuyItemDto, @CurrentUser() user: User) {
     return this.itemService.buyItem(buyItemDto.itemId, user.id);
   }
 
-  @Post("/accept-offer")
   @Authorized()
+  @Post("/accept-offer")
   async acceptOffer(
     @Body() acceptOfferDto: AcceptOfferDto,
     @CurrentUser() user: User

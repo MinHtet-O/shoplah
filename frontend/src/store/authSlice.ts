@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios, { AxiosError } from "axios";
+import { JwtPayload, jwtDecode } from "jwt-decode";
 
 interface AuthResponse {
   token: string;
@@ -12,6 +13,11 @@ interface ErrorResponse {
   errors?: {
     [key: string]: string[];
   };
+}
+
+interface DecodedToken extends JwtPayload {
+  userId: number;
+  // add other fields if present in your token
 }
 
 export const login = createAsyncThunk<
@@ -39,16 +45,12 @@ export const login = createAsyncThunk<
 });
 
 export const register = createAsyncThunk<
-  AuthResponse,
+  void,
   { username: string; email: string; password: string },
   { rejectValue: ErrorResponse }
 >("auth/register", async (userData, { rejectWithValue }) => {
   try {
-    const response = await axios.post<AuthResponse>(
-      "http://localhost:8080/auth/register",
-      userData
-    );
-    return response.data;
+    await axios.post("http://localhost:8080/auth/register", userData);
   } catch (error) {
     const axiosError = error as AxiosError<ErrorResponse>;
     if (axiosError.response?.data) {
@@ -67,6 +69,7 @@ interface AuthState {
   isAuthenticated: boolean;
   isLoading: boolean;
   error: ErrorResponse | null;
+  userId: number | null;
 }
 
 const initialState: AuthState = {
@@ -74,6 +77,7 @@ const initialState: AuthState = {
   isAuthenticated: false,
   isLoading: false,
   error: null,
+  userId: null,
 };
 
 const authSlice = createSlice({
@@ -84,6 +88,7 @@ const authSlice = createSlice({
       state.token = null;
       state.isAuthenticated = false;
       state.error = null;
+      state.userId = null;
     },
     clearAuthError: (state) => {
       state.error = null;
@@ -100,6 +105,17 @@ const authSlice = createSlice({
         state.isAuthenticated = true;
         state.token = action.payload.token;
         state.error = null;
+
+        try {
+          const decodedToken = jwtDecode<DecodedToken>(action.payload.token);
+          state.userId = decodedToken.userId;
+        } catch (error) {
+          state.error = {
+            status: "error",
+            statusCode: 500,
+            message: "Failed to decode token",
+          };
+        }
       })
       .addCase(login.rejected, (state, action) => {
         state.isLoading = false;
@@ -113,10 +129,8 @@ const authSlice = createSlice({
         state.isLoading = true;
         state.error = null;
       })
-      .addCase(register.fulfilled, (state, action) => {
+      .addCase(register.fulfilled, (state) => {
         state.isLoading = false;
-        state.isAuthenticated = true;
-        state.token = action.payload.token;
         state.error = null;
       })
       .addCase(register.rejected, (state, action) => {

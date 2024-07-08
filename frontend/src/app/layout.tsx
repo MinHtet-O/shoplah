@@ -2,9 +2,8 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import "bulma/css/bulma.min.css";
-import { Provider } from "react-redux";
-import { store } from "@/store/store";
 const inter = Inter({ subsets: ["latin"] });
+import "@fortawesome/fontawesome-free/css/all.min.css";
 
 export const metadata: Metadata = {
   title: "Create Next App",

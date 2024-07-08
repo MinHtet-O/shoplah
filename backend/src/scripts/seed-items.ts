@@ -23,7 +23,7 @@ export async function seedItems() {
       return;
     }
 
-    const numberOfItems = 10; // Specify the number of items you want to generate
+    const numberOfItems = 40; // Specify the number of items you want to generate
     const items = [];
 
     for (let i = 0; i < numberOfItems; i++) {
