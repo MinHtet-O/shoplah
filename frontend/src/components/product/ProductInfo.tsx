@@ -11,7 +11,7 @@ const ProductInfo: React.FC<ProductInfoProps> = ({ product }) => {
   const listingTimeAgo = formatDistanceToNow(new Date(product.created_at), {
     addSuffix: true,
   });
-
+  const isSold = product.status === "sold";
   return (
     <div className="columns">
       <div className="column is-half">

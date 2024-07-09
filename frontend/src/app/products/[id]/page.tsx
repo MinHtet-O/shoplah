@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchItemDetail } from "@/store/itemsSlice";
+import { fetchItemDetail, buyItem } from "@/store/itemsSlice";
 import { RootState, AppDispatch } from "@/store/store";
 import withAuth from "@/components/auth/withAuth";
 import MakeOffer from "@/components/product/MakeOffer";
@@ -39,8 +39,12 @@ const ProductDetail: React.FC<{ productId: string }> = ({ productId }) => {
         )
       : null;
 
-  const handleBuyClick = () => {
-    alert("Buy functionality not implemented yet");
+  const handleBuyClick = async () => {
+    try {
+      await dispatch(buyItem(product?.id ?? 0)).unwrap();
+    } catch (error) {
+      // Error handling already taken care of in the slice
+    }
   };
 
   const handleOfferSuccess = () => {
@@ -85,6 +89,8 @@ const ProductDetail: React.FC<{ productId: string }> = ({ productId }) => {
     );
   }
 
+  const isSold = product.status === "sold";
+
   return (
     <div className="section has-background-light">
       <div className="container" style={{ maxWidth: "1400px" }}>
@@ -92,6 +98,14 @@ const ProductDetail: React.FC<{ productId: string }> = ({ productId }) => {
           <div className="card-content">
             <div className="columns">
               <div className="column is-three-quarters">
+                <div className="is-flex is-align-items-center">
+                  <h6 className="title is-5 mb-2 has-text-grey">
+                    {product.title}
+                    {isSold && (
+                      <span className="tag is-danger ml-2 is-size-6">Sold</span>
+                    )}
+                  </h6>
+                </div>
                 <ProductInfo product={product} />
               </div>
               <div className="column is-one-quarter">
@@ -99,6 +113,7 @@ const ProductDetail: React.FC<{ productId: string }> = ({ productId }) => {
                   <button
                     className="button is-primary is-fullwidth mb-4"
                     onClick={handleBuyClick}
+                    disabled={isSold}
                   >
                     Buy
                   </button>
@@ -106,6 +121,7 @@ const ProductDetail: React.FC<{ productId: string }> = ({ productId }) => {
                     productId={productId}
                     initialOfferPrice={product.price - 1}
                     onOfferSuccess={handleOfferSuccess}
+                    disabled={isSold}
                   />
                   {previousOffer && (
                     <div className="notification mt-4 is-size-6">

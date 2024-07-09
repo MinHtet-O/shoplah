@@ -1,7 +1,9 @@
+// itemsSlice.ts
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { RootState } from "./store";
-import { Item, ItemDetail, FetchItemMode } from "@/types";
+import { Item, ItemDetail, FetchItemMode, ItemStatus } from "../types";
+import toast from "react-hot-toast";
 
 interface ItemState {
   items: Item[];
@@ -34,6 +36,7 @@ export const fetchItems = createAsyncThunk(
 
     if (mode === FetchItemMode.BUY && userId !== null) {
       params.append("seller_id-ne", userId.toString());
+      params.append("status", ItemStatus.AVAILABLE);
     } else if (mode === FetchItemMode.SELL && userId !== null) {
       params.append("seller_id", userId.toString());
     }
@@ -49,11 +52,50 @@ export const fetchItems = createAsyncThunk(
 
 export const fetchItemDetail = createAsyncThunk(
   "items/fetchItemDetail",
-  async (itemId: string) => {
+  async (itemId: string, { getState }) => {
     const response = await axios.get<ItemDetail>(
       `http://localhost:8080/items/${itemId}`
     );
     return response.data;
+  }
+);
+
+export const buyItem = createAsyncThunk(
+  "items/buyItem",
+  async (itemId: number, { getState, dispatch, rejectWithValue }) => {
+    const state = getState() as RootState;
+    const token = state.auth.token;
+
+    try {
+      const response = await axios.post(
+        "http://localhost:8080/items/buy",
+        { item_id: itemId },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      toast.success("Item purchased successfully!");
+      dispatch(fetchItemDetail(itemId.toString())); // Re-fetch item details after successful purchase
+      return response.data;
+    } catch (error: any) {
+      const buyItemFailedErrMsg = "Failed to purchase item";
+      if (
+        error.response &&
+        error.response.data &&
+        error.response.data.message
+      ) {
+        toast.error(`${error.response.data.message}`);
+        return rejectWithValue(error.response.data.message);
+      } else if (error.response && error.response.status === 500) {
+        toast.error(buyItemFailedErrMsg);
+        return rejectWithValue("Internal server error");
+      } else {
+        toast.error(buyItemFailedErrMsg);
+        return rejectWithValue("Failed to purchase item");
+      }
+    }
   }
 );
 
@@ -82,7 +124,6 @@ const itemsSlice = createSlice({
       .addCase(fetchItemDetail.pending, (state) => {
         state.loading = true;
         state.error = null;
-        state.itemDetail = null;
       })
       .addCase(fetchItemDetail.fulfilled, (state, action) => {
         state.loading = false;
@@ -90,8 +131,20 @@ const itemsSlice = createSlice({
       })
       .addCase(fetchItemDetail.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message || "Failed to fetch item details";
+        state.error = action.error.message || "Failed to fetch item detail";
       });
+    // .addCase(buyItem.pending, (state) => {
+    //   state.loading = true;
+    //   state.error = null;
+    // })
+    // .addCase(buyItem.fulfilled, (state, action) => {
+    //   state.loading = false;
+    //   state.itemDetail = action.payload;
+    // })
+    // .addCase(buyItem.rejected, (state, action) => {
+    //   state.loading = false;
+    //   state.error = action.payload as string;
+    // });
   },
 });
 

@@ -18,6 +18,10 @@ export interface Offer {
   created_at: string;
   updated_at: string;
 }
+export enum ItemStatus {
+  AVAILABLE = "available",
+  SOLD = "sold",
+}
 
 export enum ItemCondition {
   NEW = "new",
@@ -32,7 +36,7 @@ export interface Item {
   title: string;
   description: string;
   price: number;
-  status: string;
+  status: ItemStatus;
   condition: ItemCondition;
   brand: string;
   created_at: string;

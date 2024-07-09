@@ -45,7 +45,7 @@ const OfferHistory: React.FC<OfferHistoryProps> = ({ offers, onClose }) => {
               {sortedOffers.map((offer, index) => (
                 <li key={index} className="mb-4">
                   <div>
-                    You already offered <strong>${offer.price}</strong>,{" "}
+                    You offered <strong>${offer.price}</strong>,{" "}
                     {formatDistanceToNow(new Date(offer.created_at))} ago{" "}
                     <span className={`tag ${getStatusTagClass(offer.status)}`}>
                       {offer.status}

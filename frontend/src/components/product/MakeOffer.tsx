@@ -10,13 +10,15 @@ import "bulma-tooltip/dist/css/bulma-tooltip.min.css";
 interface MakeOfferProps {
   productId: string;
   initialOfferPrice: number;
-  onOfferSuccess: (offer: { price: number; created_at: string }) => void;
+  onOfferSuccess: (offerValue: number) => void;
+  disabled: boolean; // Add disabled prop
 }
 
 const MakeOffer: React.FC<MakeOfferProps> = ({
   productId,
   initialOfferPrice,
   onOfferSuccess,
+  disabled, // Add disabled prop
 }) => {
   const [offerPrice, setOfferPrice] = useState<number | string>(
     initialOfferPrice
@@ -34,11 +36,12 @@ const MakeOffer: React.FC<MakeOfferProps> = ({
       price: offerValue,
     };
     try {
-      const response = await dispatch(makeOffer(offerData)).unwrap();
-
+      await dispatch(makeOffer(offerData)).unwrap();
+      alert(`Offer made for $${offerValue}`);
       setOfferLoading(false);
-      onOfferSuccess(response);
+      onOfferSuccess(offerValue);
     } catch (error) {
+      alert("Failed to make offer");
       setOfferLoading(false);
     }
   };
@@ -67,6 +70,7 @@ const MakeOffer: React.FC<MakeOfferProps> = ({
             min="0"
             value={offerPrice}
             onChange={(e) => setOfferPrice(e.target.value)}
+            disabled={disabled} // Disable input if item is sold
           />
         </div>
       </div>
@@ -75,7 +79,7 @@ const MakeOffer: React.FC<MakeOfferProps> = ({
           offerLoading ? "is-loading" : ""
         }`}
         onClick={handleMakeOffer}
-        disabled={offerLoading}
+        disabled={offerLoading || disabled} // Disable button if item is sold
       >
         Offer
       </button>

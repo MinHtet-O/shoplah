@@ -38,19 +38,18 @@ export const makeOffer = createAsyncThunk(
       toast.success("Offer made successfully!");
       return response.data;
     } catch (error: any) {
-      const offerFailedErrMsg = "Opps! failed to make an offer";
       if (
         error.response &&
         error.response.data &&
         error.response.data.message
       ) {
-        toast.error(`${error.response.data.message}`);
+        toast.error(error.response.data.message);
         return rejectWithValue(error.response.data.message);
       } else if (error.response && error.response.status === 500) {
-        toast.error(offerFailedErrMsg);
+        toast.error("Internal server error. Please try again later.");
         return rejectWithValue("Internal server error");
       } else {
-        toast.error(offerFailedErrMsg);
+        toast.error("Failed to make offer");
         return rejectWithValue("Failed to make offer");
       }
     }
