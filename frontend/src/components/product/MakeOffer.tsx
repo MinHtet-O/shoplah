@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { makeOffer } from "@/store/offersSlice";
-import { OfferSubmission } from "@/store/types";
+import { OfferSubmission } from "@/types";
 import { AppDispatch } from "@/store/store";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faInfoCircle } from "@fortawesome/free-solid-svg-icons";
@@ -35,11 +35,10 @@ const MakeOffer: React.FC<MakeOfferProps> = ({
     };
     try {
       const response = await dispatch(makeOffer(offerData)).unwrap();
-      alert(`Offer made for $${offerValue}`);
+
       setOfferLoading(false);
       onOfferSuccess(response);
     } catch (error) {
-      alert("Failed to make offer");
       setOfferLoading(false);
     }
   };

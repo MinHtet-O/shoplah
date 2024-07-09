@@ -1,10 +1,11 @@
-import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
-import { Item, ItemDetail, FetchItemMode } from "./types";
 import { RootState } from "./store";
+import { Item, ItemDetail, FetchItemMode } from "@/types";
 
 interface ItemState {
   items: Item[];
+  itemDetail: ItemDetail | null;
   loading: boolean;
   error: string | null;
   selectedCategory: number | null;
@@ -12,6 +13,7 @@ interface ItemState {
 
 const initialState: ItemState = {
   items: [],
+  itemDetail: null,
   loading: false,
   error: null,
   selectedCategory: null,
@@ -45,11 +47,21 @@ export const fetchItems = createAsyncThunk(
   }
 );
 
+export const fetchItemDetail = createAsyncThunk(
+  "items/fetchItemDetail",
+  async (itemId: string) => {
+    const response = await axios.get<ItemDetail>(
+      `http://localhost:8080/items/${itemId}`
+    );
+    return response.data;
+  }
+);
+
 const itemsSlice = createSlice({
   name: "items",
   initialState,
   reducers: {
-    setSelectedCategory: (state, action: PayloadAction<number | null>) => {
+    setSelectedCategory: (state, action) => {
       state.selectedCategory = action.payload;
     },
   },
@@ -66,6 +78,19 @@ const itemsSlice = createSlice({
       .addCase(fetchItems.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message || "Failed to fetch items";
+      })
+      .addCase(fetchItemDetail.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        state.itemDetail = null;
+      })
+      .addCase(fetchItemDetail.fulfilled, (state, action) => {
+        state.loading = false;
+        state.itemDetail = action.payload;
+      })
+      .addCase(fetchItemDetail.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || "Failed to fetch item details";
       });
   },
 });

@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import CategorySelector from "@/components/product/CategorySelector";
 import ProductList from "@/components/product/ProductList";
 import { fetchItems } from "@/store/itemsSlice";
-import { FetchItemMode } from "@/store/types";
+import { FetchItemMode } from "@/types";
 import { AppDispatch, RootState } from "@/store/store";
 import withAuth from "@/components/auth/withAuth";
 

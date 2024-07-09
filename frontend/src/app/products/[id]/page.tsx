@@ -2,40 +2,29 @@
 
 import React, { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import axios from "axios";
-import Image from "next/image";
-import { formatDistanceToNow } from "date-fns";
-import { ItemDetail } from "@/store/types";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchItemDetail } from "@/store/itemsSlice";
+import { RootState, AppDispatch } from "@/store/store";
 import withAuth from "@/components/auth/withAuth";
 import MakeOffer from "@/components/product/MakeOffer";
 import OfferHistory from "@/components/offer/OfferHistory";
-import { RootState } from "@/store/store";
-import { useSelector } from "react-redux";
-import { Offer } from "@/store/types";
+import ProductInfo from "@/components/product/ProductInfo";
+import { Offer } from "@/types";
+import { formatDistanceToNow } from "date-fns";
 
 const ProductDetail: React.FC<{ productId: string }> = ({ productId }) => {
-  const [product, setProduct] = useState<ItemDetail | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-  const [isOfferHistoryVisible, setIsOfferHistoryVisible] = useState(false);
+  const dispatch = useDispatch<AppDispatch>();
+  const {
+    itemDetail: product,
+    loading,
+    error,
+  } = useSelector((state: RootState) => state.items);
   const currUserId = useSelector((state: RootState) => state.auth.userId);
-
-  const fetchProductDetails = async () => {
-    try {
-      const response = await axios.get<ItemDetail>(
-        `http://localhost:8080/items/${productId}`
-      );
-      setProduct(response.data);
-      setLoading(false);
-    } catch (error) {
-      setError((error as any).message);
-      setLoading(false);
-    }
-  };
+  const [isOfferHistoryVisible, setIsOfferHistoryVisible] = useState(false);
 
   useEffect(() => {
-    fetchProductDetails();
-  }, [productId, currUserId]);
+    dispatch(fetchItemDetail(productId));
+  }, [dispatch, productId]);
 
   const userOffers = product
     ? product.offers.filter((offer: Offer) => offer.user_id === currUserId)
@@ -55,7 +44,7 @@ const ProductDetail: React.FC<{ productId: string }> = ({ productId }) => {
   };
 
   const handleOfferSuccess = () => {
-    fetchProductDetails();
+    dispatch(fetchItemDetail(productId));
   };
 
   const openOfferHistory = () => {
@@ -96,10 +85,6 @@ const ProductDetail: React.FC<{ productId: string }> = ({ productId }) => {
     );
   }
 
-  const listingTimeAgo = formatDistanceToNow(new Date(product.created_at), {
-    addSuffix: true,
-  });
-
   return (
     <div className="section has-background-light">
       <div className="container" style={{ maxWidth: "1400px" }}>
@@ -107,50 +92,7 @@ const ProductDetail: React.FC<{ productId: string }> = ({ productId }) => {
           <div className="card-content">
             <div className="columns">
               <div className="column is-three-quarters">
-                <div className="columns">
-                  <div className="column is-half">
-                    <figure className="image is-square">
-                      <Image
-                        src={product.photo || "/images/feature1.png"}
-                        alt="Product Image"
-                        width={800}
-                        height={800}
-                      />
-                    </figure>
-                  </div>
-                  <div className="column">
-                    <h6 className="title is-5 mb-2 has-text-grey">
-                      {product.title}
-                    </h6>
-                    <p className="mb-4">{product.description}</p>
-                    <div className="content">
-                      <p className="has-text-weight-bold is-size-5 mb-4">
-                        ${product.price}
-                      </p>
-                      <div className="columns is-multiline">
-                        <div className="column is-half">
-                          <p className="has-text-grey mb-1">Category</p>
-                          <p className="mt-0">{product.category.name}</p>
-                        </div>
-                        <div className="column is-half">
-                          <p className="has-text-grey mb-1">Condition</p>
-                          <p className="mt-0">{product.condition}</p>
-                        </div>
-                        <div className="column is-half">
-                          <p className="has-text-grey mb-1">Brand</p>
-                          <p className="mt-0">{product.brand}</p>
-                        </div>
-                        <div className="column is-half">
-                          <p className="has-text-grey mb-1">Listing</p>
-                          <p className="mt-0">
-                            {listingTimeAgo} <br />
-                            by {product.seller.username}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                <ProductInfo product={product} />
               </div>
               <div className="column is-one-quarter">
                 <div className="box">
@@ -175,15 +117,17 @@ const ProductDetail: React.FC<{ productId: string }> = ({ productId }) => {
                         new Date(previousOffer.created_at)
                       )} ago`}
                       <br />
-                      <a
-                        onClick={openOfferHistory}
-                        style={{
-                          cursor: "pointer",
-                          textDecoration: "underline",
-                        }}
-                      >
-                        view offer history
-                      </a>
+                      <div className="mt-1">
+                        <a
+                          onClick={openOfferHistory}
+                          style={{
+                            cursor: "pointer",
+                            textDecoration: "underline",
+                          }}
+                        >
+                          view offer history
+                        </a>
+                      </div>
                     </div>
                   )}
                 </div>

@@ -1,7 +1,8 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { RootState } from "./store";
-import { OfferSubmission, Offer } from "./types";
+import { OfferSubmission, Offer } from "../types";
+import toast from "react-hot-toast";
 
 interface OfferState {
   offers: Offer[];
@@ -17,20 +18,42 @@ const initialState: OfferState = {
 
 export const makeOffer = createAsyncThunk(
   "offers/makeOffer",
-  async ({ item_id, price }: OfferSubmission, { getState }) => {
+  async (
+    { item_id, price }: OfferSubmission,
+    { getState, rejectWithValue }
+  ) => {
     const state = getState() as RootState;
     const token = state.auth.token;
 
-    const response = await axios.post(
-      "http://localhost:8080/offers",
-      { item_id, price },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+    try {
+      const response = await axios.post(
+        "http://localhost:8080/offers",
+        { item_id, price },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      toast.success("Offer made successfully!");
+      return response.data;
+    } catch (error: any) {
+      const offerFailedErrMsg = "Opps! failed to make an offer";
+      if (
+        error.response &&
+        error.response.data &&
+        error.response.data.message
+      ) {
+        toast.error(`${error.response.data.message}`);
+        return rejectWithValue(error.response.data.message);
+      } else if (error.response && error.response.status === 500) {
+        toast.error(offerFailedErrMsg);
+        return rejectWithValue("Internal server error");
+      } else {
+        toast.error(offerFailedErrMsg);
+        return rejectWithValue("Failed to make offer");
       }
-    );
-    return response.data;
+    }
   }
 );
 
@@ -50,7 +73,7 @@ const offersSlice = createSlice({
       })
       .addCase(makeOffer.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message || "Failed to make offer";
+        state.error = action.payload as string;
       });
   },
 });

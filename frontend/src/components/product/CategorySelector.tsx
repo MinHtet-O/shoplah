@@ -4,9 +4,9 @@ import React, { useRef, useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchCategories } from "@/store/categorysSlice";
 import { setSelectedCategory, fetchItems } from "@/store/itemsSlice";
-import { Category } from "@/store/types";
+import { Category } from "@/types";
 import { RootState, AppDispatch } from "@/store/store";
-import { FetchItemMode } from "@/store/types";
+import { FetchItemMode } from "@/types";
 
 const CategorySelector: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();

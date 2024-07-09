@@ -1,6 +1,6 @@
 import React from "react";
 import { formatDistanceToNow } from "date-fns";
-import { Offer } from "@/store/types";
+import { Offer } from "@/types";
 
 interface OfferHistoryProps {
   offers: Offer[];
@@ -45,7 +45,7 @@ const OfferHistory: React.FC<OfferHistoryProps> = ({ offers, onClose }) => {
               {sortedOffers.map((offer, index) => (
                 <li key={index} className="mb-4">
                   <div>
-                    You offered <strong>${offer.price}</strong>,{" "}
+                    You already offered <strong>${offer.price}</strong>,{" "}
                     {formatDistanceToNow(new Date(offer.created_at))} ago{" "}
                     <span className={`tag ${getStatusTagClass(offer.status)}`}>
                       {offer.status}
