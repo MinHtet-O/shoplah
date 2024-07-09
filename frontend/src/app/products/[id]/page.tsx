@@ -90,39 +90,41 @@ const ProductDetail: React.FC<{ productId: string }> = ({ productId }) => {
   }
 
   const isSold = product.status === "sold";
+  // const isBuyer = product.buyer_id === currUserId;
+  const isBuyer = true;
 
   return (
     <div className="section has-background-light">
       <div className="container" style={{ maxWidth: "1400px" }}>
         <div className="card">
           <div className="card-content">
+            {isSold && isBuyer && (
+              <div className="notification is-info is-light">
+                You purchased this item on date. See your purchase history
+              </div>
+            )}
             <div className="columns">
               <div className="column is-three-quarters">
-                <div className="is-flex is-align-items-center">
-                  <h6 className="title is-5 mb-2 has-text-grey">
-                    {product.title}
-                    {isSold && (
-                      <span className="tag is-danger ml-2 is-size-6">Sold</span>
-                    )}
-                  </h6>
-                </div>
                 <ProductInfo product={product} />
               </div>
               <div className="column is-one-quarter">
                 <div className="box">
-                  <button
-                    className="button is-primary is-fullwidth mb-4"
-                    onClick={handleBuyClick}
-                    disabled={isSold}
-                  >
-                    Buy
-                  </button>
-                  <MakeOffer
-                    productId={productId}
-                    initialOfferPrice={product.price - 1}
-                    onOfferSuccess={handleOfferSuccess}
-                    disabled={isSold}
-                  />
+                  {!isSold && (
+                    <>
+                      <button
+                        className="button is-primary is-fullwidth mb-4"
+                        onClick={handleBuyClick}
+                      >
+                        Buy
+                      </button>
+                      <MakeOffer
+                        productId={productId}
+                        initialOfferPrice={product.price - 1}
+                        onOfferSuccess={handleOfferSuccess}
+                        disabled={false}
+                      />
+                    </>
+                  )}
                   {previousOffer && (
                     <div className="notification mt-4 is-size-6">
                       {`you offered `}

@@ -11,6 +11,7 @@ import { OfferController } from "./controllers/OfferController";
 import { Category } from "./entity/Category";
 import { CategoryController } from "./controllers/CategoryController";
 import { OptionalAuthMiddleware } from "./middleware/optionalAuth";
+import { PurchaseController } from "./controllers/PurchaseController";
 
 useContainer(Container);
 
@@ -25,6 +26,7 @@ async function startServer() {
         AuthController,
         CategoryController,
         OfferController,
+        PurchaseController,
       ],
       defaultErrorHandler: false,
       middlewares: [ErrorHandler],
