@@ -55,18 +55,12 @@ const Navbar: React.FC<NavbarProps> = ({ onLoginClick, onRegisterClick }) => {
                     href="/explorer"
                     className={`button ${isActive("/explorer")}`}
                   >
-                    <span className="icon">
-                      <i className="fas fa-shopping-bag"></i>
-                    </span>
                     <span>Shop</span>
                   </Link>
                   <Link
                     href="/listings"
                     className={`button ${isActive("/listings")}`}
                   >
-                    <span className="icon">
-                      <i className="fas fa-store"></i>
-                    </span>
                     <span>My Listings</span>
                   </Link>
                 </div>
