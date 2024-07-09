@@ -10,8 +10,7 @@ import {
 import { Service } from "typedi";
 import { OfferService } from "../services/OfferService";
 import { User } from "../entity/User";
-import { OfferCreationDto } from "../dtos/OfferCreationDto"; // Import the correct path
-import { Offer } from "../entity/Offer";
+import { OfferCreationDto } from "../dtos/OfferCreationDto";
 
 @JsonController("/offers")
 @Service()
@@ -31,6 +30,8 @@ export class OfferController {
   @Authorized()
   @Post()
   create(@Body() offer: OfferCreationDto, @CurrentUser() user: User) {
+    console.log("user");
+    console.log(user);
     return this.offerService.create(offer, user.id);
   }
 

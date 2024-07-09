@@ -30,6 +30,22 @@ export const seedOffers = async () => {
       const user = faker.helpers.arrayElement(potentialBuyers);
       const price = faker.number.int({ min: 1, max: item.price - 1 });
 
+      // Check if an existing offer by the same user for the same item exists
+      const existingOffer = await offerRepository.findOne({
+        where: {
+          item_id: item.id,
+          user_id: user.id,
+          status: OfferStatus.PENDING,
+        },
+      });
+
+      if (existingOffer) {
+        // Cancel the existing offer
+        existingOffer.status = OfferStatus.CANCELLED;
+        await offerRepository.save(existingOffer);
+      }
+
+      // Create the new offer
       offers.push({
         item: item,
         item_id: item.id, // Ensure item_id is set
@@ -41,6 +57,6 @@ export const seedOffers = async () => {
     }
   }
 
-  // Save offers to the database
+  // Save new offers to the database
   await offerRepository.save(offers);
 };

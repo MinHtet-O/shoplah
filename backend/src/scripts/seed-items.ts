@@ -2,7 +2,7 @@ import { AppDataSource } from "../data-source";
 import { Item } from "../entity/Item";
 import { User } from "../entity/User";
 import { Category } from "../entity/Category";
-import { ItemStatus } from "../entity/enums";
+import { ItemStatus, ItemCondition } from "../entity/enums";
 import { faker } from "@faker-js/faker";
 
 export async function seedItems() {
@@ -29,15 +29,19 @@ export async function seedItems() {
     for (let i = 0; i < numberOfItems; i++) {
       const randomUser = faker.helpers.arrayElement(users);
       const randomCategory = faker.helpers.arrayElement(categories);
+      const randomCondition = faker.helpers.arrayElement(
+        Object.values(ItemCondition)
+      );
 
       items.push({
         seller_id: randomUser.id,
         category_id: randomCategory.id,
         title: faker.commerce.productName(),
         description: faker.lorem.sentence(),
-
         price: faker.number.int({ min: 1, max: 1000 }),
         status: ItemStatus.AVAILABLE,
+        condition: randomCondition,
+        brand: faker.company.name(),
       });
     }
 

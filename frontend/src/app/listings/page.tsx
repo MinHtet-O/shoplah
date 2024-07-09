@@ -1,18 +1,20 @@
 // File: app/listing/Listing.tsx
 "use client";
+
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import CategorySelector from "@/components/product/CategorySelector";
 import ProductList from "@/components/product/ProductList";
-import { FetchItemMode, fetchItems } from "@/store/itemSlice";
+import { fetchItems } from "@/store/itemsSlice";
+import { FetchItemMode } from "@/store/types";
 import { AppDispatch, RootState } from "@/store/store";
 import withAuth from "@/components/auth/withAuth";
 
 const Listings: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const items = useSelector((state: RootState) => state.item.items);
+  const items = useSelector((state: RootState) => state.items.items);
   const selectedCategory = useSelector(
-    (state: RootState) => state.item.selectedCategory
+    (state: RootState) => state.items.selectedCategory
   );
   const userId = useSelector((state: RootState) => state.auth.userId);
 

@@ -14,6 +14,7 @@ import { Category } from "./Category";
 import { ItemStatus } from "./enums";
 import { Offer } from "./Offer";
 import { Purchase } from "./Purchase";
+import { ItemCondition } from "./enums";
 
 @Entity("items")
 export class Item {
@@ -49,6 +50,12 @@ export class Item {
     default: ItemStatus.AVAILABLE,
   })
   status: ItemStatus;
+
+  @Column({ type: "enum", enum: ItemCondition, default: ItemCondition.NEW })
+  condition: ItemCondition;
+
+  @Column({ type: "varchar", length: 100 })
+  brand: string;
 
   @CreateDateColumn()
   created_at: Date;

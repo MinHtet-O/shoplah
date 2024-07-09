@@ -5,6 +5,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import "bulma/css/bulma.min.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
+import "bulma-tooltip/dist/css/bulma-tooltip.min.css";
 import StoreProvider from "./StoreProvider";
 import AppLayout from "./AppLayout";
 

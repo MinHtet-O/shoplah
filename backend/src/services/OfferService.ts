@@ -60,6 +60,7 @@ export class OfferService {
         item_id: data.item_id,
         user_id: userId,
         price: data.price,
+        status: OfferStatus.PENDING,
       },
     });
     if (existingOffer) {
@@ -67,6 +68,12 @@ export class OfferService {
         "You have already made an offer with the same price for this item"
       );
     }
+
+    // Cancel all existing offers for this item by the same user
+    await this.offerRepository.update(
+      { item_id: data.item_id, user_id: userId, status: OfferStatus.PENDING },
+      { status: OfferStatus.CANCELLED }
+    );
 
     const newOffer = this.offerRepository.create({
       ...data,

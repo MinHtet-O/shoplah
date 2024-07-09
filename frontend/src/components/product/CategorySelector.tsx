@@ -2,20 +2,19 @@
 
 import React, { useRef, useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import {
-  Category,
-  fetchCategories,
-  setSelectedCategory,
-  fetchItems,
-  FetchItemMode,
-} from "@/store/itemSlice";
+import { fetchCategories } from "@/store/categorysSlice";
+import { setSelectedCategory, fetchItems } from "@/store/itemsSlice";
+import { Category } from "@/store/types";
 import { RootState, AppDispatch } from "@/store/store";
+import { FetchItemMode } from "@/store/types";
 
 const CategorySelector: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const categories = useSelector((state: RootState) => state.item.categories);
+  const categories = useSelector(
+    (state: RootState) => state.categories.categories
+  );
   const selectedCategory = useSelector(
-    (state: RootState) => state.item.selectedCategory
+    (state: RootState) => state.items.selectedCategory
   );
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [showRightArrow, setShowRightArrow] = useState(false);
