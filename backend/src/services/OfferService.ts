@@ -38,21 +38,19 @@ export class OfferService {
       where: { id: data.item_id },
     });
     if (!item) {
-      throw new BadRequestError("Invalid item");
+      throw new BadRequestError("invalid item");
     }
 
     if (item.status !== ItemStatus.AVAILABLE) {
-      throw new BadRequestError("Oops! Seems, the item is already sold");
+      throw new BadRequestError("seems, the item is already sold");
     }
 
     if (item.seller_id === userId) {
-      throw new BadRequestError("You cannot send an offer for your own item");
+      throw new BadRequestError("you cannot make offer for your item");
     }
 
-    if (data.price > item.price) {
-      throw new BadRequestError(
-        "Offer price cannot be higher than the original item price"
-      );
+    if (data.price >= item.price) {
+      throw new BadRequestError("offer price must lower than original price");
     }
 
     const existingOffer = await this.offerRepository.findOne({
@@ -64,9 +62,7 @@ export class OfferService {
       },
     });
     if (existingOffer) {
-      throw new BadRequestError(
-        "You have already made an offer with the same price for this item"
-      );
+      throw new BadRequestError("you already offered the same price");
     }
 
     // Cancel all existing offers for this item by the same user

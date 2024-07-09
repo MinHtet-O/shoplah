@@ -3,9 +3,9 @@ import { IsNotEmpty, IsNumber } from "class-validator";
 export class AcceptOfferDto {
   @IsNumber()
   @IsNotEmpty()
-  itemId: number;
+  item_id: number;
 
   @IsNumber()
   @IsNotEmpty()
-  offerId: number;
+  offer_id: number;
 }

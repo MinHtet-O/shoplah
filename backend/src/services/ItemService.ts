@@ -207,13 +207,13 @@ export class ItemService {
       });
 
       if (!item) {
-        throw new NotFoundError("Item not found");
+        throw new NotFoundError("item not found");
       }
       if (item.status !== ItemStatus.AVAILABLE || item.purchase) {
-        throw new ForbiddenError("Item is not available for purchase");
+        throw new ForbiddenError("item is not available for purchase");
       }
       if (item.seller_id === buyerId) {
-        throw new ForbiddenError("You cannot buy your own item");
+        throw new ForbiddenError("you cannot buy your item");
       }
 
       const purchase = new Purchase();
