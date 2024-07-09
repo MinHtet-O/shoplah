@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { RootState } from "./store";
-import { OfferSubmission, Offer } from "../types";
+import { Offer } from "../types";
 import toast from "react-hot-toast";
 
 interface OfferState {
@@ -19,7 +19,7 @@ const initialState: OfferState = {
 export const makeOffer = createAsyncThunk(
   "offers/makeOffer",
   async (
-    { item_id, price }: OfferSubmission,
+    { item_id, price }: { item_id: number; price: number },
     { getState, rejectWithValue }
   ) => {
     const state = getState() as RootState;
@@ -56,6 +56,43 @@ export const makeOffer = createAsyncThunk(
   }
 );
 
+export const acceptOffer = createAsyncThunk(
+  "offers/acceptOffer",
+  async ({ offer_id }: { offer_id: number }, { getState, rejectWithValue }) => {
+    const state = getState() as RootState;
+    const token = state.auth.token;
+    console.log({ offer_id });
+    try {
+      const response = await axios.post(
+        "http://localhost:8080/items/accept-offer",
+        { offer_id },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      toast.success("Offer accepted successfully!");
+      return response.data;
+    } catch (error: any) {
+      if (
+        error.response &&
+        error.response.data &&
+        error.response.data.message
+      ) {
+        toast.error(error.response.data.message);
+        return rejectWithValue(error.response.data.message);
+      } else if (error.response && error.response.status === 500) {
+        toast.error("Internal server error. Please try again later.");
+        return rejectWithValue("Internal server error");
+      } else {
+        toast.error("Failed to accept offer");
+        return rejectWithValue("Failed to accept offer");
+      }
+    }
+  }
+);
+
 const offersSlice = createSlice({
   name: "offers",
   initialState,
@@ -71,6 +108,18 @@ const offersSlice = createSlice({
         state.offers.push(action.payload);
       })
       .addCase(makeOffer.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+      .addCase(acceptOffer.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(acceptOffer.fulfilled, (state, action) => {
+        state.loading = false;
+        // Optionally, you might want to remove the accepted offer from the state or update the product status
+      })
+      .addCase(acceptOffer.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       });

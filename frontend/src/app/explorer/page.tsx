@@ -3,7 +3,7 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import CategorySelector from "@/components/product/CategorySelector";
-import ProductList from "@/components/product/ProductList";
+import { ProductListBuy } from "@/components/product/ProductList";
 import { fetchItems } from "@/store/itemsSlice";
 import { FetchItemMode } from "@/types";
 import { AppDispatch, RootState } from "@/store/store";
@@ -27,7 +27,7 @@ const Explorer: React.FC = () => {
         <CategorySelector />
       </section>
       <section className="section">
-        <ProductList items={items} />
+        <ProductListBuy items={items} />
       </section>
     </div>
   );

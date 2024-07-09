@@ -44,10 +44,25 @@ export interface Item {
   photo?: string;
 }
 
+export enum PurchaseType {
+  DIRECT_PURCHASE = "direct_purchase",
+  OFFER_ACCEPTED = "offer_accepted",
+}
+export interface Purchase {
+  id: number;
+  item_id: number;
+  buyer_id: number;
+  seller_id: number;
+  price: number;
+  type: string;
+  purchased_at: string;
+}
+
 export interface ItemDetail extends Item {
   category: Category;
   seller: Seller;
   offers: Offer[];
+  purchase: Purchase | null;
 }
 
 export enum FetchItemMode {

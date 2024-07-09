@@ -37,11 +37,10 @@ const MakeOffer: React.FC<MakeOfferProps> = ({
     };
     try {
       await dispatch(makeOffer(offerData)).unwrap();
-      alert(`Offer made for $${offerValue}`);
+
       setOfferLoading(false);
       onOfferSuccess(offerValue);
     } catch (error) {
-      alert("Failed to make offer");
       setOfferLoading(false);
     }
   };

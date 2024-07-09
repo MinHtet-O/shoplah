@@ -67,10 +67,6 @@ export class ItemController {
     @Body() acceptOfferDto: AcceptOfferDto,
     @CurrentUser() user: User
   ) {
-    return this.itemService.acceptOffer(
-      acceptOfferDto.item_id,
-      acceptOfferDto.offer_id,
-      user.id
-    );
+    return this.itemService.acceptOffer(acceptOfferDto.offer_id, user.id);
   }
 }

@@ -4,7 +4,7 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import CategorySelector from "@/components/product/CategorySelector";
-import ProductList from "@/components/product/ProductList";
+import { ProductListSell } from "@/components/product/ProductList";
 import { fetchItems } from "@/store/itemsSlice";
 import { FetchItemMode } from "@/types";
 import { AppDispatch, RootState } from "@/store/store";
@@ -28,7 +28,7 @@ const Listings: React.FC = () => {
         <CategorySelector />
       </section>
       <section className="section">
-        <ProductList items={items} />
+        <ProductListSell items={items} />
       </section>
     </div>
   );

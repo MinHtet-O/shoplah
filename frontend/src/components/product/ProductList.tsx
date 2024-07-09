@@ -3,7 +3,7 @@
 "use client";
 import React from "react";
 import { useRouter } from "next/navigation";
-import { Item } from "@/store/itemSlice";
+import { Item } from "@/types";
 import Image from "next/image";
 import { formatDistanceToNow } from "date-fns";
 
@@ -11,11 +11,37 @@ interface ProductListProps {
   items: Item[];
 }
 
-const ProductList: React.FC<ProductListProps> = ({ items }) => {
+export const ProductListBuy: React.FC<ProductListProps> = ({ items }) => {
+  const router = useRouter();
+  const handleProductClick = (itemId: number) => {
+    router.push(`/products/buy/${itemId}`);
+  };
   return (
     <div className="columns is-multiline">
       {items.map((item: Item) => (
-        <Product key={item.id} item={item} />
+        <Product
+          onProductClick={handleProductClick}
+          key={item.id}
+          item={item}
+        />
+      ))}
+    </div>
+  );
+};
+
+export const ProductListSell: React.FC<ProductListProps> = ({ items }) => {
+  const router = useRouter();
+  const handleProductClick = (itemId: number) => {
+    router.push(`/products/sell/${itemId}`);
+  };
+  return (
+    <div className="columns is-multiline">
+      {items.map((item: Item) => (
+        <Product
+          onProductClick={handleProductClick}
+          key={item.id}
+          item={item}
+        />
       ))}
     </div>
   );
@@ -23,19 +49,16 @@ const ProductList: React.FC<ProductListProps> = ({ items }) => {
 
 interface ProductProps {
   item: Item;
+  onProductClick: (itemId: number) => void;
 }
 
-const Product: React.FC<ProductProps> = ({ item }) => {
-  const router = useRouter();
-
-  const handleClick = () => {
-    router.push(`/products/${item.id}`);
-  };
-
+const Product: React.FC<ProductProps> = ({ item, onProductClick }) => {
   return (
     <div
       className="column is-one-quarter-desktop is-half-tablet"
-      onClick={handleClick}
+      onClick={() => {
+        onProductClick(item.id);
+      }}
       style={{ cursor: "pointer" }}
     >
       <div className="card">
@@ -64,5 +87,3 @@ const Product: React.FC<ProductProps> = ({ item }) => {
     </div>
   );
 };
-
-export default ProductList;

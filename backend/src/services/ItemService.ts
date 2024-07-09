@@ -53,7 +53,7 @@ export class ItemService {
 
     const item = await this.itemRepository.findOne({
       where: { id },
-      relations: ["category", "seller", "offers"],
+      relations: ["category", "seller", "offers", "purchase"],
       select: {
         ...excludeFields(itemMetadata, []),
         category: excludeFields(categoryMetadata, []),
@@ -137,19 +137,21 @@ export class ItemService {
     );
   }
 
-  async acceptOffer(
-    itemId: number,
-    offerId: number,
-    userId: number
-  ): Promise<Item> {
+  async acceptOffer(offerId: number, userId: number): Promise<Item> {
     return AppDataSource.transaction(async (transactionalEntityManager) => {
-      const item = await transactionalEntityManager.findOne(Item, {
-        where: { id: itemId },
-        relations: ["offers"],
+      const offer = await transactionalEntityManager.findOne(Offer, {
+        where: { id: offerId },
+        relations: ["item"],
       });
 
+      if (!offer) {
+        throw new NotFoundError("Offer not found");
+      }
+
+      const item = offer.item;
+
       if (!item) {
-        throw new NotFoundError("Item not found");
+        throw new NotFoundError("Item not found for this offer");
       }
 
       if (item.seller_id !== userId) {
@@ -162,21 +164,15 @@ export class ItemService {
         throw new BadRequestError("Item is not available for sale");
       }
 
-      const acceptedOffer = item.offers.find((offer) => offer.id === offerId);
-
-      if (!acceptedOffer) {
-        throw new NotFoundError("Offer not found for this item");
-      }
-
-      if (acceptedOffer.status !== OfferStatus.PENDING) {
+      if (offer.status !== OfferStatus.PENDING) {
         throw new BadRequestError("This offer is no longer pending");
       }
 
       const purchase = new Purchase();
-      purchase.item_id = itemId;
-      purchase.buyer_id = acceptedOffer.user_id;
+      purchase.item_id = item.id;
+      purchase.buyer_id = offer.user_id;
       purchase.seller_id = item.seller_id;
-      purchase.price = acceptedOffer.price;
+      purchase.price = offer.price;
       purchase.type = PurchaseType.OFFER_ACCEPTED;
       purchase.purchased_at = new Date();
       await transactionalEntityManager.save(purchase);
@@ -185,13 +181,17 @@ export class ItemService {
       item.purchase = purchase;
       await transactionalEntityManager.save(item);
 
-      acceptedOffer.status = OfferStatus.ACCEPTED;
-      await transactionalEntityManager.save(acceptedOffer);
+      offer.status = OfferStatus.ACCEPTED;
+      await transactionalEntityManager.save(offer);
 
       // Reject all other offers
       await transactionalEntityManager.update(
         Offer,
-        { item: { id: itemId }, status: OfferStatus.PENDING, id: Not(offerId) },
+        {
+          item: { id: item.id },
+          status: OfferStatus.PENDING,
+          id: Not(offerId),
+        },
         { status: OfferStatus.REJECTED }
       );
 

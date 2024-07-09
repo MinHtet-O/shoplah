@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchItemDetail, buyItem } from "@/store/itemsSlice";
 import { RootState, AppDispatch } from "@/store/store";
@@ -10,10 +10,11 @@ import MakeOffer from "@/components/product/MakeOffer";
 import OfferHistory from "@/components/offer/OfferHistory";
 import ProductInfo from "@/components/product/ProductInfo";
 import { Offer } from "@/types";
-import { formatDistanceToNow } from "date-fns";
+import { format, formatDistanceToNow } from "date-fns";
 
-const ProductDetail: React.FC<{ productId: string }> = ({ productId }) => {
+const ProductDetailBuyer: React.FC<{ productId: string }> = ({ productId }) => {
   const dispatch = useDispatch<AppDispatch>();
+  const router = useRouter();
   const {
     itemDetail: product,
     loading,
@@ -90,17 +91,26 @@ const ProductDetail: React.FC<{ productId: string }> = ({ productId }) => {
   }
 
   const isSold = product.status === "sold";
-  // const isBuyer = product.buyer_id === currUserId;
-  const isBuyer = true;
+  const isBuyer = product.purchase && product.purchase.buyer_id === currUserId;
 
   return (
     <div className="section has-background-light">
       <div className="container" style={{ maxWidth: "1400px" }}>
         <div className="card">
           <div className="card-content">
-            {isSold && isBuyer && (
+            {isBuyer && (
               <div className="notification is-info is-light">
-                You purchased this item on date. See your purchase history
+                You purchased this item on{" "}
+                {format(
+                  new Date(product.purchase!.purchased_at),
+                  "MMMM d, yyyy 'at' hh:mm a"
+                )}
+                . <a href="/purchase-history">See your purchase history</a>
+              </div>
+            )}
+            {isSold && !isBuyer && (
+              <div className="notification is-info is-light">
+                Oops! Someone purchased this already.
               </div>
             )}
             <div className="columns">
@@ -161,7 +171,7 @@ const ProductDetail: React.FC<{ productId: string }> = ({ productId }) => {
   );
 };
 
-const ProductDetailPage: React.FC = () => {
+const ProductDetailBuyerPage: React.FC = () => {
   const params = useParams();
   const { id } = params;
 
@@ -175,7 +185,7 @@ const ProductDetailPage: React.FC = () => {
     );
   }
 
-  return <ProductDetail productId={id} />;
+  return <ProductDetailBuyer productId={id} />;
 };
 
-export default withAuth(ProductDetailPage);
+export default withAuth(ProductDetailBuyerPage);
