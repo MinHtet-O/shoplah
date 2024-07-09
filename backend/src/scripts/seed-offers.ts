@@ -33,8 +33,8 @@ export const seedOffers = async () => {
       // Check if an existing offer by the same user for the same item exists
       const existingOffer = await offerRepository.findOne({
         where: {
-          item_id: item.id,
-          user_id: user.id,
+          item: { id: item.id },
+          user: { id: user.id },
           status: OfferStatus.PENDING,
         },
       });
@@ -45,15 +45,25 @@ export const seedOffers = async () => {
         await offerRepository.save(existingOffer);
       }
 
-      // Create the new offer
-      offers.push({
-        item: item,
-        item_id: item.id, // Ensure item_id is set
-        user: user,
-        user_id: user.id, // Ensure user_id is set
-        price: price,
-        status: OfferStatus.PENDING,
+      // Check again if there is any pending offer by the same user for the same item
+      const pendingOffer = await offerRepository.findOne({
+        where: {
+          item: { id: item.id },
+          user: { id: user.id },
+          status: OfferStatus.PENDING,
+        },
       });
+
+      if (!pendingOffer) {
+        // Create the new offer only if there is no pending offer
+        const newOffer = offerRepository.create({
+          item: item,
+          user: user,
+          price: price,
+          status: OfferStatus.PENDING,
+        });
+        offers.push(newOffer);
+      }
     }
   }
 
