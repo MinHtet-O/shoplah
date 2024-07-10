@@ -24,9 +24,7 @@ const Explorer: React.FC = () => {
   return (
     <div className="container">
       <section className="section">
-        <CategorySelector />
-      </section>
-      <section className="section">
+        <CategorySelector fetchItemMode={FetchItemMode.BUY} />
         <ProductListBuy items={items} />
       </section>
     </div>

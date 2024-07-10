@@ -1,3 +1,5 @@
+// File: store/offerSlice.ts
+
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { RootState } from "./store";
@@ -61,7 +63,6 @@ export const acceptOffer = createAsyncThunk(
   async ({ offer_id }: { offer_id: number }, { getState, rejectWithValue }) => {
     const state = getState() as RootState;
     const token = state.auth.token;
-    console.log({ offer_id });
     try {
       const response = await axios.post(
         "http://localhost:8080/items/accept-offer",
@@ -88,6 +89,38 @@ export const acceptOffer = createAsyncThunk(
       } else {
         toast.error("Failed to accept offer");
         return rejectWithValue("Failed to accept offer");
+      }
+    }
+  }
+);
+
+export const fetchOffersByItemId = createAsyncThunk(
+  "offers/fetchOffersByItemId",
+  async (item_id: number, { getState, rejectWithValue }) => {
+    const state = getState() as RootState;
+    const token = state.auth.token;
+
+    try {
+      const response = await axios.get(
+        `http://localhost:8080/offers?item_id=${item_id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error: any) {
+      if (
+        error.response &&
+        error.response.data &&
+        error.response.data.message
+      ) {
+        return rejectWithValue(error.response.data.message);
+      } else if (error.response && error.response.status === 500) {
+        return rejectWithValue("Internal server error");
+      } else {
+        return rejectWithValue("Failed to fetch offers");
       }
     }
   }
@@ -120,6 +153,18 @@ const offersSlice = createSlice({
         // Optionally, you might want to remove the accepted offer from the state or update the product status
       })
       .addCase(acceptOffer.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+      .addCase(fetchOffersByItemId.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchOffersByItemId.fulfilled, (state, action) => {
+        state.loading = false;
+        state.offers = action.payload;
+      })
+      .addCase(fetchOffersByItemId.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       });

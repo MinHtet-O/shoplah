@@ -9,15 +9,30 @@ export interface Seller {
   email: string;
 }
 
+export interface User {
+  id: number;
+  username: string;
+  email: string;
+}
+
 export interface Offer {
   id: number;
   item_id: number;
   user_id: number;
+  user: User;
   price: number;
-  status: string;
+  status: OfferStatus;
   created_at: string;
   updated_at: string;
 }
+
+export enum OfferStatus {
+  PENDING = "pending",
+  ACCEPTED = "accepted",
+  CANCELLED = "cancelled",
+  REJECTED = "rejected",
+}
+
 export enum ItemStatus {
   AVAILABLE = "available",
   SOLD = "sold",

@@ -1,4 +1,3 @@
-// File: app/listing/Listing.tsx
 "use client";
 
 import React, { useEffect } from "react";
@@ -25,9 +24,7 @@ const Listings: React.FC = () => {
   return (
     <div className="container">
       <section className="section">
-        <CategorySelector />
-      </section>
-      <section className="section">
+        <CategorySelector fetchItemMode={FetchItemMode.SELL} />
         <ProductListSell items={items} />
       </section>
     </div>

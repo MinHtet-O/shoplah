@@ -1,5 +1,5 @@
 import { Service } from "typedi";
-import { Repository } from "typeorm";
+import { FindManyOptions, FindOptionsWhere, Not, Repository } from "typeorm";
 import { Offer } from "../entity/Offer";
 import { Item } from "../entity/Item";
 import { OfferStatus, ItemStatus } from "../entity/enums";
@@ -21,8 +21,24 @@ export class OfferService {
     this.itemRepository = AppDataSource.getRepository(Item);
   }
 
-  async getAll(): Promise<Offer[]> {
-    return this.offerRepository.find();
+  async getAll(filters: Partial<Offer> = {}): Promise<Offer[]> {
+    // Define the where object with a more flexible type
+    const where: { [key: string]: any } = {};
+
+    // Process filters to handle _ne (not equal) and other operators
+    for (const [key, value] of Object.entries(filters)) {
+      const [field, operator] = key.split("-");
+      if (operator === "ne") {
+        where[field] = Not(value);
+      } else {
+        where[key] = value;
+      }
+    }
+
+    return this.offerRepository.find({
+      relations: ["user"],
+      where: where as any,
+    });
   }
 
   async getOne(id: number): Promise<Offer> {

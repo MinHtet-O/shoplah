@@ -14,7 +14,7 @@ interface ProductListProps {
 export const ProductListBuy: React.FC<ProductListProps> = ({ items }) => {
   const router = useRouter();
   const handleProductClick = (itemId: number) => {
-    router.push(`/products/buy/${itemId}`);
+    router.push(`/explorer/${itemId}`);
   };
   return (
     <div className="columns is-multiline">
@@ -32,7 +32,7 @@ export const ProductListBuy: React.FC<ProductListProps> = ({ items }) => {
 export const ProductListSell: React.FC<ProductListProps> = ({ items }) => {
   const router = useRouter();
   const handleProductClick = (itemId: number) => {
-    router.push(`/products/sell/${itemId}`);
+    router.push(`/listings/${itemId}`);
   };
   return (
     <div className="columns is-multiline">

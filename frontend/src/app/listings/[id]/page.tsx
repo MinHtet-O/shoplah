@@ -1,44 +1,63 @@
-// File: components/item/ProductDetailSeller.tsx
-
 "use client";
 
-import React, { useEffect } from "react";
-import { useParams, useRouter } from "next/navigation";
+import React, { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchItemDetail } from "@/store/itemsSlice";
-import { acceptOffer } from "@/store/offersSlice";
+import { fetchOffersByItemId, acceptOffer } from "@/store/offersSlice";
 import { RootState, AppDispatch } from "@/store/store";
 import withAuth from "@/components/auth/withAuth";
 import ProductInfo from "@/components/product/ProductInfo";
-import { Offer } from "@/types";
-import { format, formatDistanceToNow } from "date-fns";
+import OfferList from "@/components/offer/OfferList";
+import OfferModal, { OfferView } from "@/components/offer/OfferModal";
+import { format } from "date-fns";
 
-const ProductDetailSeller: React.FC<{ productId: string }> = ({
+interface ProductDetailSellerProps {
+  productId: string;
+}
+const ProductDetailSeller: React.FC<ProductDetailSellerProps> = ({
   productId,
 }) => {
   const dispatch = useDispatch<AppDispatch>();
-  const router = useRouter();
+
+  const [showModal, setShowModal] = useState(false);
+
   const {
     itemDetail: product,
-    loading,
-    error,
+    loading: itemLoading,
+    error: itemError,
   } = useSelector((state: RootState) => state.items);
+  const {
+    offers,
+    loading: offersLoading,
+    error: offersError,
+  } = useSelector((state: RootState) => state.offers);
   const currUserId = useSelector((state: RootState) => state.auth.userId);
 
   useEffect(() => {
     dispatch(fetchItemDetail(productId));
+    dispatch(fetchOffersByItemId(Number(productId)));
   }, [dispatch, productId]);
 
-  const handleAcceptOffer = async (offerId: number) => {
-    try {
-      await dispatch(acceptOffer({ offer_id: offerId })).unwrap();
-      dispatch(fetchItemDetail(productId)); // Refresh product details after accepting offer
-    } catch (error) {
-      // Error handling already taken care of in the slice
-    }
+  const handleRefreshOffers = () => {
+    dispatch(fetchOffersByItemId(Number(productId)));
+    dispatch(fetchItemDetail(productId));
   };
 
-  if (loading) {
+  const handleAcceptOffer = async (offerId: number) => {
+    await dispatch(acceptOffer({ offer_id: offerId })).unwrap();
+    handleRefreshOffers();
+  };
+
+  const handleShowModal = () => {
+    setShowModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+  };
+
+  if (itemLoading || offersLoading) {
     return (
       <div className="section has-background-light">
         <div className="container">
@@ -48,11 +67,11 @@ const ProductDetailSeller: React.FC<{ productId: string }> = ({
     );
   }
 
-  if (error) {
+  if (itemError) {
     return (
       <div className="section has-background-light">
         <div className="container">
-          <div className="notification is-danger">Error: {error}</div>
+          <div className="notification is-danger">Error: {itemError}</div>
         </div>
       </div>
     );
@@ -71,6 +90,9 @@ const ProductDetailSeller: React.FC<{ productId: string }> = ({
   const isSold = product.status === "sold";
   const isSeller = product.seller_id === currUserId;
 
+  const pendingOffers = offers.filter((offer) => offer.status === "pending");
+  const nonPendingOffers = offers.filter((offer) => offer.status !== "pending");
+  console.log({ nonPendingOffers });
   return (
     <div className="section has-background-light">
       <div className="container" style={{ maxWidth: "1400px" }}>
@@ -105,42 +127,51 @@ const ProductDetailSeller: React.FC<{ productId: string }> = ({
                 <ProductInfo product={product} />
               </div>
               <div className="column is-one-quarter">
-                <div className="box">
-                  {!isSold && (
-                    <>
-                      <h3 className="title is-5">Offers</h3>
-                      {product.offers.length === 0 ? (
-                        <p>No offers yet</p>
-                      ) : (
-                        <ul>
-                          {product.offers.map((offer: Offer) => (
-                            <li key={offer.id} className="mb-3">
-                              <div className="box">
-                                <p className="is-size-6 has-text-weight-bold">
-                                  ${offer.price}
-                                </p>
-                                <p className="is-size-7 has-text-grey">
-                                  {formatDistanceToNow(
-                                    new Date(offer.created_at),
-                                    {
-                                      addSuffix: true,
-                                    }
-                                  )}
-                                </p>
-                                <button
-                                  className="button is-primary is-small mt-2"
-                                  onClick={() => handleAcceptOffer(offer.id)}
-                                >
-                                  Accept
-                                </button>
-                              </div>
-                            </li>
-                          ))}
-                        </ul>
-                      )}
-                    </>
-                  )}
-                </div>
+                {isSold ? (
+                  <>
+                    <button
+                      className="button is-text mt-4"
+                      onClick={handleShowModal}
+                      disabled={nonPendingOffers.length === 0}
+                    >
+                      View offer history
+                    </button>
+                    {showModal && (
+                      <OfferModal
+                        title="Offer History"
+                        offers={offers}
+                        onClose={handleCloseModal}
+                        view={OfferView.SELLER}
+                      />
+                    )}
+                  </>
+                ) : (
+                  <>
+                    <div className="card">
+                      <div className="card-content">
+                        <OfferList
+                          offers={pendingOffers}
+                          onAcceptOffer={handleAcceptOffer}
+                        />
+                        <button
+                          className="button is-text mt-4 p-0"
+                          onClick={handleShowModal}
+                          disabled={nonPendingOffers.length === 0}
+                        >
+                          View ca`ncelled offers
+                        </button>
+                        {showModal && (
+                          <OfferModal
+                            title="Cancelled Offers"
+                            offers={nonPendingOffers}
+                            onClose={handleCloseModal}
+                            view={OfferView.SELLER}
+                          />
+                        )}
+                      </div>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           </div>

@@ -153,7 +153,8 @@ export class ItemService {
       if (!item) {
         throw new NotFoundError("Item not found for this offer");
       }
-
+      console.log("Seller_ID", item.seller_id);
+      console.log("User_ID", userId);
       if (item.seller_id !== userId) {
         throw new ForbiddenError(
           "Only the seller can accept offers for this item"

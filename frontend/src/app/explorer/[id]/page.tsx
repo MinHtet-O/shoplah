@@ -7,7 +7,7 @@ import { fetchItemDetail, buyItem } from "@/store/itemsSlice";
 import { RootState, AppDispatch } from "@/store/store";
 import withAuth from "@/components/auth/withAuth";
 import MakeOffer from "@/components/product/MakeOffer";
-import OfferHistory from "@/components/offer/OfferHistory";
+import OfferModal, { OfferView } from "@/components/offer/OfferModal";
 import ProductInfo from "@/components/product/ProductInfo";
 import { Offer } from "@/types";
 import { format, formatDistanceToNow } from "date-fns";
@@ -21,7 +21,7 @@ const ProductDetailBuyer: React.FC<{ productId: string }> = ({ productId }) => {
     error,
   } = useSelector((state: RootState) => state.items);
   const currUserId = useSelector((state: RootState) => state.auth.userId);
-  const [isOfferHistoryVisible, setIsOfferHistoryVisible] = useState(false);
+  const [isOfferModalVisible, setIsOfferModalVisible] = useState(false);
 
   useEffect(() => {
     dispatch(fetchItemDetail(productId));
@@ -41,23 +41,19 @@ const ProductDetailBuyer: React.FC<{ productId: string }> = ({ productId }) => {
       : null;
 
   const handleBuyClick = async () => {
-    try {
-      await dispatch(buyItem(product?.id ?? 0)).unwrap();
-    } catch (error) {
-      // Error handling already taken care of in the slice
-    }
+    await dispatch(buyItem(product?.id ?? 0));
   };
 
   const handleOfferSuccess = () => {
     dispatch(fetchItemDetail(productId));
   };
 
-  const openOfferHistory = () => {
-    setIsOfferHistoryVisible(true);
+  const openOfferModal = () => {
+    setIsOfferModalVisible(true);
   };
 
-  const closeOfferHistory = () => {
-    setIsOfferHistoryVisible(false);
+  const closeOfferModal = () => {
+    setIsOfferModalVisible(false);
   };
 
   if (loading) {
@@ -100,10 +96,22 @@ const ProductDetailBuyer: React.FC<{ productId: string }> = ({ productId }) => {
           <div className="card-content">
             {isBuyer && (
               <div className="notification is-info is-light">
-                You purchased this item on{" "}
-                {format(
-                  new Date(product.purchase!.purchased_at),
-                  "MMMM d, yyyy 'at' hh:mm a"
+                {product.purchase?.type === "offer_accepted" ? (
+                  <>
+                    Your bought this item for ${product.purchase!.price} on{" "}
+                    {format(
+                      new Date(product.purchase!.purchased_at),
+                      "MMMM d, yyyy 'at' hh:mm:ss a"
+                    )}
+                  </>
+                ) : (
+                  <>
+                    You bought this item for ${product.purchase!.price} on{" "}
+                    {format(
+                      new Date(product.purchase!.purchased_at),
+                      "MMMM d, yyyy 'at' hh:mm:ss a"
+                    )}
+                  </>
                 )}
                 . <a href="/purchase-history">See your purchase history</a>
               </div>
@@ -137,7 +145,7 @@ const ProductDetailBuyer: React.FC<{ productId: string }> = ({ productId }) => {
                   )}
                   {previousOffer && (
                     <div className="notification mt-4 is-size-6">
-                      {`you offered `}
+                      {`You offered `}
                       <span className="has-text-weight-semibold">
                         ${previousOffer.price}
                       </span>
@@ -147,13 +155,13 @@ const ProductDetailBuyer: React.FC<{ productId: string }> = ({ productId }) => {
                       <br />
                       <div className="mt-1">
                         <a
-                          onClick={openOfferHistory}
+                          onClick={openOfferModal}
                           style={{
                             cursor: "pointer",
                             textDecoration: "underline",
                           }}
                         >
-                          view offer history
+                          View offer history
                         </a>
                       </div>
                     </div>
@@ -164,8 +172,13 @@ const ProductDetailBuyer: React.FC<{ productId: string }> = ({ productId }) => {
           </div>
         </div>
       </div>
-      {isOfferHistoryVisible && (
-        <OfferHistory offers={userOffers} onClose={closeOfferHistory} />
+      {isOfferModalVisible && (
+        <OfferModal
+          title="Your Offer History"
+          offers={userOffers.reverse()}
+          onClose={closeOfferModal}
+          view={OfferView.BUYER}
+        />
       )}
     </div>
   );

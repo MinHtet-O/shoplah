@@ -6,11 +6,13 @@ import {
   Body,
   CurrentUser,
   Authorized,
+  QueryParams,
 } from "routing-controllers";
 import { Service } from "typedi";
 import { OfferService } from "../services/OfferService";
 import { User } from "../entity/User";
 import { OfferCreationDto } from "../dtos/OfferCreationDto";
+import { Offer } from "../entity/Offer";
 
 @JsonController("/offers")
 @Service()
@@ -18,8 +20,8 @@ export class OfferController {
   constructor(private offerService: OfferService) {}
 
   @Get()
-  getAll() {
-    return this.offerService.getAll();
+  getAll(@QueryParams() filters: Partial<Offer>) {
+    return this.offerService.getAll(filters);
   }
 
   @Get("/:id")
@@ -30,8 +32,6 @@ export class OfferController {
   @Authorized()
   @Post()
   create(@Body() offer: OfferCreationDto, @CurrentUser() user: User) {
-    console.log("user");
-    console.log(user);
     return this.offerService.create(offer, user.id);
   }
 

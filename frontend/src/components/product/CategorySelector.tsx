@@ -8,7 +8,13 @@ import { Category } from "@/types";
 import { RootState, AppDispatch } from "@/store/store";
 import { FetchItemMode } from "@/types";
 
-const CategorySelector: React.FC = () => {
+interface CategorySelectorProps {
+  fetchItemMode: FetchItemMode;
+}
+
+const CategorySelector: React.FC<CategorySelectorProps> = ({
+  fetchItemMode,
+}) => {
   const dispatch = useDispatch<AppDispatch>();
   const categories = useSelector(
     (state: RootState) => state.categories.categories
@@ -60,7 +66,7 @@ const CategorySelector: React.FC = () => {
 
   const handleCategoryClick = (categoryId: number | null) => {
     dispatch(setSelectedCategory(categoryId));
-    dispatch(fetchItems({ mode: FetchItemMode.BUY }));
+    dispatch(fetchItems({ mode: fetchItemMode }));
   };
 
   return (
