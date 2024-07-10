@@ -1,8 +1,7 @@
-// File: components/item/ProductList.tsx
-
-"use client";
 import React from "react";
 import { useRouter } from "next/navigation";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store/store";
 import { Item } from "@/types";
 import Image from "next/image";
 import { formatDistanceToNow } from "date-fns";
@@ -11,36 +10,22 @@ interface ProductListProps {
   items: Item[];
 }
 
-export const ProductListBuy: React.FC<ProductListProps> = ({ items }) => {
+const ProductList: React.FC<ProductListProps> = ({ items }) => {
   const router = useRouter();
-  const handleProductClick = (itemId: number) => {
-    router.push(`/explorer/${itemId}`);
-  };
-  return (
-    <div className="columns is-multiline">
-      {items.map((item: Item) => (
-        <Product
-          onProductClick={handleProductClick}
-          key={item.id}
-          item={item}
-        />
-      ))}
-    </div>
-  );
-};
+  const viewType = useSelector((state: RootState) => state.filter.viewType);
 
-export const ProductListSell: React.FC<ProductListProps> = ({ items }) => {
-  const router = useRouter();
   const handleProductClick = (itemId: number) => {
-    router.push(`/listings/${itemId}`);
+    const basePath = viewType === "BUY" ? "/explorer" : "/listings";
+    router.push(`${basePath}/${itemId}`);
   };
+
   return (
     <div className="columns is-multiline">
       {items.map((item: Item) => (
         <Product
-          onProductClick={handleProductClick}
           key={item.id}
           item={item}
+          onProductClick={() => handleProductClick(item.id)}
         />
       ))}
     </div>
@@ -49,16 +34,14 @@ export const ProductListSell: React.FC<ProductListProps> = ({ items }) => {
 
 interface ProductProps {
   item: Item;
-  onProductClick: (itemId: number) => void;
+  onProductClick: () => void;
 }
 
 const Product: React.FC<ProductProps> = ({ item, onProductClick }) => {
   return (
     <div
       className="column is-one-quarter-desktop is-half-tablet"
-      onClick={() => {
-        onProductClick(item.id);
-      }}
+      onClick={onProductClick}
       style={{ cursor: "pointer" }}
     >
       <div className="card">
@@ -87,3 +70,5 @@ const Product: React.FC<ProductProps> = ({ item, onProductClick }) => {
     </div>
   );
 };
+
+export default ProductList;

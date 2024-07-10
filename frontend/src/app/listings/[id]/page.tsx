@@ -158,7 +158,7 @@ const ProductDetailSeller: React.FC<ProductDetailSellerProps> = ({
                           onClick={handleShowModal}
                           disabled={nonPendingOffers.length === 0}
                         >
-                          View ca`ncelled offers
+                          View cancelled offers
                         </button>
                         {showModal && (
                           <OfferModal

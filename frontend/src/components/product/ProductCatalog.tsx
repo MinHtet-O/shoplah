@@ -3,13 +3,13 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import CategorySelector from "@/components/product/CategorySelector";
-import { ProductListSell } from "@/components/product/ProductList";
+import ProductList from "@/components/product/ProductList";
 import { fetchItems } from "@/store/itemsSlice";
 import { FetchItemMode } from "@/types";
 import { AppDispatch, RootState } from "@/store/store";
 import withAuth from "@/components/auth/withAuth";
 
-const Listings: React.FC = () => {
+const ProductCatalog: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const items = useSelector((state: RootState) => state.items.items);
   const selectedCategory = useSelector(
@@ -18,17 +18,17 @@ const Listings: React.FC = () => {
   const userId = useSelector((state: RootState) => state.auth.userId);
 
   useEffect(() => {
-    dispatch(fetchItems({ mode: FetchItemMode.SELL }));
+    dispatch(fetchItems());
   }, [dispatch, selectedCategory, userId]);
 
   return (
     <div className="container">
       <section className="section">
-        <CategorySelector fetchItemMode={FetchItemMode.SELL} />
-        <ProductListSell items={items} />
+        <CategorySelector />
+        <ProductList items={items} />
       </section>
     </div>
   );
 };
 
-export default withAuth(Listings);
+export default withAuth(ProductCatalog);

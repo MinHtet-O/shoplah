@@ -1,4 +1,4 @@
-"use client";
+// CategorySelector.tsx
 
 import React, { useRef, useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
@@ -6,15 +6,12 @@ import { fetchCategories } from "@/store/categorysSlice";
 import { setSelectedCategory, fetchItems } from "@/store/itemsSlice";
 import { Category } from "@/types";
 import { RootState, AppDispatch } from "@/store/store";
-import { FetchItemMode } from "@/types";
 
 interface CategorySelectorProps {
-  fetchItemMode: FetchItemMode;
+  // Remove fetchItemMode prop
 }
 
-const CategorySelector: React.FC<CategorySelectorProps> = ({
-  fetchItemMode,
-}) => {
+const CategorySelector: React.FC<CategorySelectorProps> = () => {
   const dispatch = useDispatch<AppDispatch>();
   const categories = useSelector(
     (state: RootState) => state.categories.categories
@@ -22,6 +19,7 @@ const CategorySelector: React.FC<CategorySelectorProps> = ({
   const selectedCategory = useSelector(
     (state: RootState) => state.items.selectedCategory
   );
+  const viewType = useSelector((state: RootState) => state.filter.viewType); // Get viewType from Redux state
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [showRightArrow, setShowRightArrow] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -66,7 +64,8 @@ const CategorySelector: React.FC<CategorySelectorProps> = ({
 
   const handleCategoryClick = (categoryId: number | null) => {
     dispatch(setSelectedCategory(categoryId));
-    dispatch(fetchItems({ mode: fetchItemMode }));
+
+    dispatch(fetchItems());
   };
 
   return (

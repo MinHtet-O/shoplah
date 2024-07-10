@@ -1,4 +1,3 @@
-"use client";
 import React from "react";
 import { useSelector, useDispatch } from "react-redux";
 import Image from "next/image";
@@ -9,6 +8,9 @@ import logo from "../../../public/logo-icon.png";
 import { RootState } from "../../store/store";
 import { logout } from "../../store/authSlice";
 import { AppDispatch } from "../../store/store";
+import { ViewType, setViewType } from "../../store/filterSlice";
+import { fetchItems } from "@/store/itemsSlice";
+import { useRouter } from "next/navigation";
 
 interface NavbarProps {
   onLoginClick: () => void;
@@ -17,15 +19,24 @@ interface NavbarProps {
 
 const Navbar: React.FC<NavbarProps> = ({ onLoginClick, onRegisterClick }) => {
   const { isAuthenticated } = useSelector((state: RootState) => state.auth);
+  const { viewType } = useSelector((state: RootState) => state.filter);
   const dispatch = useDispatch<AppDispatch>();
   const pathname = usePathname();
-
+  const router = useRouter();
   const handleLogout = () => {
     dispatch(logout());
   };
 
-  const isActive = (path: string) => {
-    return pathname === path ? "is-primary" : "is-light";
+  const handleShopClick = () => {
+    dispatch(setViewType(ViewType.BUY));
+    dispatch(fetchItems());
+    router.push("/");
+  };
+
+  const handleListingsClick = () => {
+    dispatch(setViewType(ViewType.SELL));
+    dispatch(fetchItems());
+    router.push("/");
   };
 
   return (
@@ -36,10 +47,7 @@ const Navbar: React.FC<NavbarProps> = ({ onLoginClick, onRegisterClick }) => {
     >
       <div className="container">
         <div className="navbar-brand p-0">
-          <Link
-            href={isAuthenticated ? "/explorer" : "/"}
-            className={`navbar-item ${styles.navbarBrand}`}
-          >
+          <Link href={"/"} className={`navbar-item ${styles.navbarBrand}`}>
             <Image height={35} src={logo} alt="ShopLah Logo" />
             <span className={`has-text-primary ${styles.navbarText}`}>
               ShopLah
@@ -51,18 +59,22 @@ const Navbar: React.FC<NavbarProps> = ({ onLoginClick, onRegisterClick }) => {
             {isAuthenticated && (
               <div className="navbar-item">
                 <div className="buttons">
-                  <Link
-                    href="/explorer"
-                    className={`button ${isActive("/explorer")}`}
+                  <button
+                    className={`button ${
+                      viewType === ViewType.BUY ? "is-primary" : ""
+                    }`}
+                    onClick={handleShopClick}
                   >
                     <span>Shop</span>
-                  </Link>
-                  <Link
-                    href="/listings"
-                    className={`button ${isActive("/listings")}`}
+                  </button>
+                  <button
+                    className={`button ${
+                      viewType === ViewType.SELL ? "is-primary" : ""
+                    }`}
+                    onClick={handleListingsClick}
                   >
                     <span>My Listings</span>
-                  </Link>
+                  </button>
                 </div>
               </div>
             )}

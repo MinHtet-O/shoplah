@@ -4,6 +4,7 @@ import axios from "axios";
 import { RootState } from "./store";
 import { Item, ItemDetail, FetchItemMode, ItemStatus } from "../types";
 import toast from "react-hot-toast";
+import { ViewType } from "./filterSlice";
 
 interface ItemState {
   items: Item[];
@@ -23,8 +24,9 @@ const initialState: ItemState = {
 
 export const fetchItems = createAsyncThunk(
   "items/fetchItems",
-  async ({ mode }: { mode: FetchItemMode }, { getState }) => {
+  async (_, { getState }) => {
     const state = getState() as RootState;
+    const viewType = state.filter.viewType; // Fetch viewType from state
     const categoryId = state.items.selectedCategory;
     const userId = state.auth.userId;
     let url = "http://localhost:8080/items";
@@ -34,10 +36,10 @@ export const fetchItems = createAsyncThunk(
       params.append("category_id", categoryId.toString());
     }
 
-    if (mode === FetchItemMode.BUY && userId !== null) {
+    if (viewType === ViewType.BUY && userId !== null) {
       params.append("seller_id-ne", userId.toString());
       params.append("status", ItemStatus.AVAILABLE);
-    } else if (mode === FetchItemMode.SELL && userId !== null) {
+    } else if (viewType === ViewType.SELL && userId !== null) {
       params.append("seller_id", userId.toString());
     }
 

@@ -1,12 +1,13 @@
-// File: app/page.tsx or app/index.tsx
+// File: app/index.tsx
 
 "use client";
-import { useRouter } from "next/navigation";
-import Landing from "../components/landing/Landing";
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import { useRouter } from "next/navigation";
 import { RootState, AppDispatch } from "@/store/store";
 import { initializeAuth } from "@/store/authSlice";
+import Landing from "../components/landing/Landing";
+import ProductCatalog from "../components/product/ProductCatalog"; // Adjust path as needed
 
 export default function Index() {
   const router = useRouter();
@@ -21,16 +22,18 @@ export default function Index() {
   }, [dispatch]);
 
   useEffect(() => {
-    if (isAuthenticated) {
-      router.push("/explorer");
-    } else if (!initializing) {
+    if (!initializing) {
       setIsAuthLoading(false);
     }
-  }, [isAuthenticated, initializing, router]);
+  }, [initializing]);
 
   if (isAuthLoading) {
-    return <div></div>;
+    return <div>Loading...</div>; // Adjust loading state as needed
   }
 
-  return <div>{!isAuthenticated && <Landing />}</div>;
+  return (
+    <div>
+      {!isAuthenticated && <Landing />} {isAuthenticated && <ProductCatalog />}{" "}
+    </div>
+  );
 }
