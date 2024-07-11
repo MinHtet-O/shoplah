@@ -21,6 +21,9 @@ const filterSlice = createSlice({
   reducers: {
     setViewType(state, action: PayloadAction<ViewType>) {
       state.viewType = action.payload;
+      state.selectedCategory = null;
+      state.selectedCondition = null;
+      state.sorting = null;
     },
     setSelectedCategory(state, action: PayloadAction<number | null>) {
       state.selectedCategory = action.payload;

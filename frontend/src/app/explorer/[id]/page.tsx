@@ -11,6 +11,7 @@ import OfferModal, { OfferView } from "@/components/offer/OfferModal";
 import ProductInfo from "@/components/product/ProductInfo";
 import { Offer } from "@/types";
 import { format, formatDistanceToNow } from "date-fns";
+import LoadingSpinner from "@/components/loading/LoadingSpinner";
 
 const ProductDetailBuyer: React.FC<{ productId: string }> = ({ productId }) => {
   const dispatch = useDispatch<AppDispatch>();
@@ -19,6 +20,7 @@ const ProductDetailBuyer: React.FC<{ productId: string }> = ({ productId }) => {
     itemDetail: product,
     loading,
     error,
+    buyItemLoading,
   } = useSelector((state: RootState) => state.items);
   const currUserId = useSelector((state: RootState) => state.auth.userId);
   const [isOfferModalVisible, setIsOfferModalVisible] = useState(false);
@@ -60,7 +62,7 @@ const ProductDetailBuyer: React.FC<{ productId: string }> = ({ productId }) => {
     return (
       <div className="section has-background-light">
         <div className="container">
-          <div className="notification is-info">Loading...</div>
+          <LoadingSpinner></LoadingSpinner>
         </div>
       </div>
     );
@@ -88,7 +90,7 @@ const ProductDetailBuyer: React.FC<{ productId: string }> = ({ productId }) => {
 
   const isSold = product.status === "sold";
   const isBuyer = product.purchase && product.purchase.buyer_id === currUserId;
-
+  console.log({ buyItemLoading });
   return (
     <div className="section has-background-light">
       <div className="container" style={{ maxWidth: "1400px" }}>
@@ -130,7 +132,9 @@ const ProductDetailBuyer: React.FC<{ productId: string }> = ({ productId }) => {
                   {!isSold && (
                     <>
                       <button
-                        className="button is-primary is-fullwidth mb-4"
+                        className={`button is-primary is-fullwidth mb-4 ${
+                          buyItemLoading ? "is-loading" : ""
+                        }`}
                         onClick={handleBuyClick}
                       >
                         Buy

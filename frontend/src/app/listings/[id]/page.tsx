@@ -11,6 +11,7 @@ import ProductInfo from "@/components/product/ProductInfo";
 import OfferList from "@/components/offer/OfferList";
 import OfferModal, { OfferView } from "@/components/offer/OfferModal";
 import { format } from "date-fns";
+import LoadingSpinner from "@/components/loading/LoadingSpinner";
 
 interface ProductDetailSellerProps {
   productId: string;
@@ -61,7 +62,7 @@ const ProductDetailSeller: React.FC<ProductDetailSellerProps> = ({
     return (
       <div className="section has-background-light">
         <div className="container">
-          <div className="notification is-info">Loading...</div>
+          <LoadingSpinner></LoadingSpinner>
         </div>
       </div>
     );

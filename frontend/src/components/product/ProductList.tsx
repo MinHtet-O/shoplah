@@ -6,6 +6,7 @@ import { Item } from "@/types";
 import Image from "next/image";
 import { formatDistanceToNow } from "date-fns";
 import ClipLoader from "react-spinners/ClipLoader";
+import LoadingSpinner from "../loading/LoadingSpinner";
 
 interface ProductListProps {
   items: Item[];
@@ -73,24 +74,6 @@ const ProductList: React.FC<ProductListProps> = ({
     </div>
   );
 };
-
-const LoadingSpinner: React.FC = () => (
-  <div
-    style={{
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
-    }}
-  >
-    <div
-      style={{
-        height: 60,
-      }}
-    >
-      <ClipLoader color="#5fceb2" size={60} />
-    </div>
-  </div>
-);
 
 interface ProductProps {
   item: Item;

@@ -10,10 +10,12 @@ interface ItemState {
   itemDetail: ItemDetail | null;
   loading: boolean;
   error: string | null;
+  buyItemLoading: boolean;
 }
 
 const initialState: ItemState = {
   items: [],
+  buyItemLoading: false,
   itemDetail: null,
   loading: false,
   error: null,
@@ -147,6 +149,15 @@ const itemsSlice = createSlice({
       .addCase(fetchItemDetail.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message || "Failed to fetch item detail";
+      })
+      .addCase(buyItem.pending, (state) => {
+        state.buyItemLoading = true;
+      })
+      .addCase(buyItem.fulfilled, (state) => {
+        state.buyItemLoading = false;
+      })
+      .addCase(buyItem.rejected, (state, action) => {
+        state.buyItemLoading = false;
       });
   },
 });
