@@ -5,12 +5,19 @@ import { RootState } from "@/store/store";
 import { Item } from "@/types";
 import Image from "next/image";
 import { formatDistanceToNow } from "date-fns";
+import ClipLoader from "react-spinners/ClipLoader";
 
 interface ProductListProps {
   items: Item[];
+  isLoading: boolean;
+  isError: boolean;
 }
 
-const ProductList: React.FC<ProductListProps> = ({ items }) => {
+const ProductList: React.FC<ProductListProps> = ({
+  items,
+  isLoading,
+  isError,
+}) => {
   const router = useRouter();
   const viewType = useSelector((state: RootState) => state.filter.viewType);
 
@@ -18,6 +25,41 @@ const ProductList: React.FC<ProductListProps> = ({ items }) => {
     const basePath = viewType === "BUY" ? "/explorer" : "/listings";
     router.push(`${basePath}/${itemId}`);
   };
+
+  if (isLoading) {
+    return <LoadingSpinner />;
+  }
+
+  if (isError) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <h2 className="is-size-4">
+          {" "}
+          Error loading items. Please try again later.
+        </h2>
+      </div>
+    );
+  }
+
+  if (items.length === 0) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <h2 className="is-size-4 is-text-grey">No items found!</h2>
+      </div>
+    );
+  }
 
   return (
     <div className="columns is-multiline">
@@ -31,6 +73,24 @@ const ProductList: React.FC<ProductListProps> = ({ items }) => {
     </div>
   );
 };
+
+const LoadingSpinner: React.FC = () => (
+  <div
+    style={{
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+    }}
+  >
+    <div
+      style={{
+        height: 60,
+      }}
+    >
+      <ClipLoader color="#5fceb2" size={60} />
+    </div>
+  </div>
+);
 
 interface ProductProps {
   item: Item;

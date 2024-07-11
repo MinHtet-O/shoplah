@@ -12,6 +12,7 @@ import { Category } from "./entity/Category";
 import { CategoryController } from "./controllers/CategoryController";
 import { OptionalAuthMiddleware } from "./middleware/optionalAuth";
 import { PurchaseController } from "./controllers/PurchaseController";
+import { DelayMiddleware } from "./middleware/delayMiddleware";
 
 useContainer(Container);
 
@@ -29,7 +30,7 @@ async function startServer() {
         PurchaseController,
       ],
       defaultErrorHandler: false,
-      middlewares: [ErrorHandler],
+      middlewares: [ErrorHandler, DelayMiddleware],
       authorizationChecker: authChecker,
       currentUserChecker: currentUserChecker,
     });

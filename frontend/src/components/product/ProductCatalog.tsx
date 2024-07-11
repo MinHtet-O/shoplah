@@ -19,6 +19,7 @@ const ProductCatalog: React.FC = () => {
     (state: RootState) => state.filter.selectedCondition
   );
   const userId = useSelector((state: RootState) => state.auth.userId);
+  const { loading, error } = useSelector((state: RootState) => state.items);
 
   useEffect(() => {
     dispatch(fetchItems());
@@ -35,7 +36,11 @@ const ProductCatalog: React.FC = () => {
             <Sortings /> {/* Use the Sortings component */}
           </div>
         </div>
-        <ProductList items={items} />
+        <ProductList
+          isLoading={loading}
+          isError={error ? true : false}
+          items={items}
+        />
       </div>
     </div>
   );
