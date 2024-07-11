@@ -4,6 +4,7 @@ import {
   MinLength,
   MaxLength,
   IsPositive,
+  IsNotEmpty,
 } from "class-validator";
 
 export class ItemCreationDto {
@@ -17,7 +18,16 @@ export class ItemCreationDto {
 
   @IsString()
   @MinLength(10, { message: "Description must be at least 10 characters long" })
+  @IsNotEmpty()
   description: string;
+
+  @IsString()
+  @IsNotEmpty()
+  condition: string;
+
+  @IsString()
+  @IsNotEmpty()
+  brand: string;
 
   @IsInt()
   @IsPositive({ message: "Price must be a positive integer" })

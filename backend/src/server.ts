@@ -8,11 +8,12 @@ import { ErrorHandler } from "./middleware/errorHandler";
 import { authChecker, currentUserChecker } from "./middleware/authChecker"; // Import the authChecker and currentUserChecker
 import { AuthController } from "./controllers/AuthController";
 import { OfferController } from "./controllers/OfferController";
-import { Category } from "./entity/Category";
 import { CategoryController } from "./controllers/CategoryController";
 import { OptionalAuthMiddleware } from "./middleware/optionalAuth";
 import { PurchaseController } from "./controllers/PurchaseController";
 import { DelayMiddleware } from "./middleware/delayMiddleware";
+import express, { Request, Response, NextFunction } from "express";
+import path from "path";
 
 useContainer(Container);
 
@@ -35,6 +36,18 @@ async function startServer() {
       currentUserChecker: currentUserChecker,
     });
 
+    // Serve static files from the 'uploads' directory
+    app.use(
+      "/uploads",
+      express.static(path.resolve(__dirname, "..", "uploads"))
+    );
+
+    // Handle any unexpected errors
+    app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+      console.error(err.stack);
+      res.status(500).send("Something broke!");
+    });
+
     const port = process.env.PORT || 8080;
     app.listen(port, () => {
       console.log(
@@ -48,4 +61,17 @@ async function startServer() {
   }
 }
 
+async function startFileServer() {
+  const fileServer = express();
+
+  // Serve static files from the 'uploads' directory
+  fileServer.use("/", express.static(path.resolve(__dirname, "..", "uploads")));
+
+  const fileServerPort = process.env.FILE_SERVER_PORT || 8081;
+  fileServer.listen(fileServerPort, () => {
+    console.log(`File Server is running on port ${fileServerPort}`);
+  });
+}
+
 startServer();
+startFileServer();

@@ -5,18 +5,23 @@ import {
   Put,
   Delete,
   Param,
-  Body,
+  Req,
   QueryParams,
   CurrentUser,
   Authorized,
+  UseBefore,
 } from "routing-controllers";
 import { Service } from "typedi";
 import { ItemService } from "../services/ItemService";
 import { User } from "../entity/User";
-import { ItemCreationDto } from "../dtos/ItemCreationDto";
 import { Item } from "../entity/Item";
 import { AcceptOfferDto } from "../dtos/AcceptOfferDto";
 import { BuyItemDto } from "../dtos/BuyItemDto";
+import { MulterMiddleware } from "../middleware/MulterMiddleware";
+import { Request } from "express";
+import { plainToInstance } from "class-transformer";
+import { validateOrReject } from "class-validator";
+import { ItemCreationDto } from "../dtos/ItemCreationDto";
 
 interface ItemQueryParams extends Partial<Item> {
   sortField?: string;
@@ -42,18 +47,11 @@ export class ItemController {
 
   @Authorized()
   @Post()
-  create(@Body() item: ItemCreationDto, @CurrentUser() user: User) {
-    return this.itemService.create(item, user.id);
-  }
-
-  @Authorized()
-  @Put("/:id")
-  update(
-    @Param("id") id: number,
-    @Body() item: Partial<Item>,
-    @CurrentUser() user: User
-  ) {
-    return this.itemService.update(id, item, user.id);
+  @UseBefore(MulterMiddleware) // Apply the Multer middleware
+  async create(@Req() req: Request, @CurrentUser() user: User) {
+    const item = plainToInstance(ItemCreationDto, req.body); // Transform plain object to DTO instance
+    await validateOrReject(item); // Validate the DTO instance
+    return this.itemService.create(item, user.id, req.file);
   }
 
   @Authorized()
@@ -64,16 +62,15 @@ export class ItemController {
 
   @Authorized()
   @Post("/buy")
-  async buyItem(@Body() buyItemDto: BuyItemDto, @CurrentUser() user: User) {
+  async buyItem(@Req() req: Request, @CurrentUser() user: User) {
+    const buyItemDto: BuyItemDto = JSON.parse(req.body.data);
     return this.itemService.buyItem(buyItemDto.item_id, user.id);
   }
 
   @Authorized()
   @Post("/accept-offer")
-  async acceptOffer(
-    @Body() acceptOfferDto: AcceptOfferDto,
-    @CurrentUser() user: User
-  ) {
+  async acceptOffer(@Req() req: Request, @CurrentUser() user: User) {
+    const acceptOfferDto: AcceptOfferDto = JSON.parse(req.body.data);
     return this.itemService.acceptOffer(acceptOfferDto.offer_id, user.id);
   }
 }

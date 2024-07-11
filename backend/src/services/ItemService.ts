@@ -1,9 +1,14 @@
 import { Service } from "typedi";
-import { FindManyOptions, FindOptionsWhere, Not, Repository } from "typeorm";
+import { Not, Repository } from "typeorm";
 import { Item } from "../entity/Item";
 import { Offer } from "../entity/Offer";
 import { Category } from "../entity/Category";
-import { ItemStatus, OfferStatus, PurchaseType } from "../entity/enums";
+import {
+  ItemCondition,
+  ItemStatus,
+  OfferStatus,
+  PurchaseType,
+} from "../entity/enums";
 import {
   NotFoundError,
   BadRequestError,
@@ -14,6 +19,10 @@ import { excludeFields } from "../utils/queryUtils";
 import { User } from "../entity/User";
 import { ItemCreationDto } from "../dtos/ItemCreationDto";
 import { Purchase } from "../entity/Purchase";
+import sharp from "sharp";
+import fs from "fs";
+import path from "path";
+import { v4 as uuidv4 } from "uuid";
 
 @Service()
 export class ItemService {
@@ -27,6 +36,20 @@ export class ItemService {
     this.offerRepository = AppDataSource.getRepository(Offer);
     this.categoryRepository = AppDataSource.getRepository(Category);
     this.userRepository = AppDataSource.getRepository(User);
+  }
+
+  private getUniqueFilename(title: string, originalFilename: string): string {
+    const uuid = uuidv4();
+    const sanitizedTitle = title.replace(/[^a-z0-9]/gi, "_").toLowerCase();
+    return `${uuid}_${sanitizedTitle}${path.extname(originalFilename)}`;
+  }
+
+  private ensureUploadsDirectoryExists() {
+    const uploadsDir = path.resolve(__dirname, "..", "..", "uploads");
+    if (!fs.existsSync(uploadsDir)) {
+      fs.mkdirSync(uploadsDir, { recursive: true });
+    }
+    return uploadsDir;
   }
 
   async getAll(
@@ -47,9 +70,18 @@ export class ItemService {
 
     const order = sortField ? { [sortField]: sortOrder } : {};
     console.log({ where, order });
-    return this.itemRepository.find({
+    const items = await this.itemRepository.find({
       where: where as any,
       order,
+    });
+
+    const baseFileServerUrl = "http://localhost:8081/"; // Replace with your base URL
+
+    return items.map((item) => {
+      if (item.image) {
+        item.image = `${baseFileServerUrl}/${item.image}`;
+      }
+      return item;
     });
   }
 
@@ -69,19 +101,26 @@ export class ItemService {
     });
 
     if (!item) {
-      throw new NotFoundError("Item not found");
+      throw new NotFoundError("item not found");
     }
+    const baseFileServerUrl = "http://localhost:8081/"; // Replace with your base URL
+
+    item.image = `${baseFileServerUrl}/${item.image}`;
 
     return item;
   }
 
-  async create(data: ItemCreationDto, userId: number): Promise<Item> {
+  async create(
+    data: ItemCreationDto,
+    userId: number,
+    file?: Express.Multer.File
+  ): Promise<Item> {
     const existingItem = await this.itemRepository.findOne({
       where: { title: data.title, seller_id: userId },
     });
     if (existingItem) {
       throw new BadRequestError(
-        "An item with this title already exists for this seller"
+        "an item with this title already exists for this seller"
       );
     }
 
@@ -89,51 +128,52 @@ export class ItemService {
       where: { id: data.category_id },
     });
     if (!category) {
-      throw new BadRequestError("Invalid category");
+      throw new BadRequestError("invalid category");
     }
 
+    if (!file) {
+      throw new BadRequestError("product image is required");
+    }
+
+    // Ensure uploads directory exists
+    const uploadsDir = this.ensureUploadsDirectoryExists();
+
+    // Generate unique filename using UUID and item title
+    const uniqueFilename = this.getUniqueFilename(
+      data.title,
+      file.originalname
+    );
+    const resizedImagePath = `uploads/${uniqueFilename}`;
+
+    // Resize and save the image
+    await sharp(file.path).resize(400, 400).toFile(resizedImagePath);
+
+    // Remove the original file from the temporary directory
+    fs.unlinkSync(file.path);
+
+    // Create the item with the image path
     const newItem = this.itemRepository.create({
       ...data,
       seller_id: userId,
       status: ItemStatus.AVAILABLE,
       category: category,
+      condition: data.condition as ItemCondition,
+      image: uniqueFilename,
     });
+
     return this.itemRepository.save(newItem);
-  }
-
-  async update(id: number, data: Partial<Item>, userId: number): Promise<Item> {
-    const item = await this.getOne(id);
-    if (item.seller_id !== userId) {
-      throw new ForbiddenError("Only the owner can edit this item");
-    }
-    if (item.status !== ItemStatus.AVAILABLE) {
-      throw new ForbiddenError("This item can no longer be edited");
-    }
-
-    if (data.category_id) {
-      const category = await this.categoryRepository.findOne({
-        where: { id: data.category_id },
-      });
-      if (!category) {
-        throw new BadRequestError("Invalid category");
-      }
-      item.category = category;
-    }
-
-    Object.assign(item, data);
-    return this.itemRepository.save(item);
   }
 
   async delete(id: number, userId: number): Promise<boolean> {
     const item = await this.itemRepository.findOne({ where: { id } });
     if (!item) {
-      throw new NotFoundError("Item not found");
+      throw new NotFoundError("item not found");
     }
     if (item.seller_id !== userId) {
-      throw new ForbiddenError("Only the owner can delete this item");
+      throw new ForbiddenError("only the owner can delete this item");
     }
     if (item.status !== ItemStatus.AVAILABLE) {
-      throw new ForbiddenError("This item can no longer be deleted");
+      throw new ForbiddenError("this item can no longer be deleted");
     }
 
     const result = await this.itemRepository.delete(id);
@@ -152,7 +192,7 @@ export class ItemService {
       });
 
       if (!offer) {
-        throw new NotFoundError("Offer not found");
+        throw new NotFoundError("offer not found");
       }
 
       const item = offer.item;
@@ -164,16 +204,16 @@ export class ItemService {
       console.log("User_ID", userId);
       if (item.seller_id !== userId) {
         throw new ForbiddenError(
-          "Only the seller can accept offers for this item"
+          "only the seller can accept offers for this item"
         );
       }
 
       if (item.status !== ItemStatus.AVAILABLE) {
-        throw new BadRequestError("Item is not available for sale");
+        throw new BadRequestError("item is not available for sale");
       }
 
       if (offer.status !== OfferStatus.PENDING) {
-        throw new BadRequestError("This offer is no longer pending");
+        throw new BadRequestError("this offer is no longer pending");
       }
 
       const purchase = new Purchase();

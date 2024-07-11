@@ -51,11 +51,14 @@ export class Item {
   })
   status: ItemStatus;
 
-  @Column({ type: "enum", enum: ItemCondition, default: ItemCondition.NEW })
+  @Column({ type: "enum", enum: ItemCondition })
   condition: ItemCondition;
 
   @Column({ type: "varchar", length: 100 })
   brand: string;
+
+  @Column({ type: "varchar", length: 255 })
+  image: string;
 
   @CreateDateColumn()
   created_at: Date;

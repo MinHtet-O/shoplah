@@ -42,7 +42,8 @@ export async function seedItems() {
         status: ItemStatus.AVAILABLE,
         condition: randomCondition,
         brand: faker.company.name(),
-      });
+        image: "",
+      } as Item);
     }
 
     await itemRepository.save(items);
