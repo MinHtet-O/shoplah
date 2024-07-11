@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { RootState } from "./store";
-import { Item, ItemDetail, FetchItemMode, ItemStatus } from "../types";
+import { Item, ItemDetail, ItemStatus, Sorting } from "../types";
 import toast from "react-hot-toast";
 import { ViewType } from "../types";
 
@@ -47,16 +47,13 @@ export const fetchItems = createAsyncThunk(
     }
 
     if (sorting) {
-      if (sorting === "latest") {
+      if (sorting === Sorting.LATEST) {
         params.append("sortField", "created_at");
         params.append("sortOrder", "DESC");
-      } else if (sorting === "oldest") {
-        params.append("sortField", "created_at");
-        params.append("sortOrder", "ASC");
-      } else if (sorting === "price_high_to_low") {
+      } else if (sorting === Sorting.HIGHEST_PRICE) {
         params.append("sortField", "price");
         params.append("sortOrder", "DESC");
-      } else if (sorting === "price_low_to_high") {
+      } else if (sorting === Sorting.LOWEST_PRICE) {
         params.append("sortField", "price");
         params.append("sortOrder", "ASC");
       }

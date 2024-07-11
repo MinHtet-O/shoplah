@@ -86,12 +86,13 @@ export interface ItemDetail extends Item {
   purchase: Purchase | null;
 }
 
-export enum FetchItemMode {
-  BUY = "buy",
-  SELL = "sell",
-}
-
 export interface OfferSubmission {
   item_id: number;
   price: number;
+}
+
+export enum Sorting {
+  LATEST = "latest",
+  LOWEST_PRICE = "price_low_to_high",
+  HIGHEST_PRICE = "price_high_to_low",
 }

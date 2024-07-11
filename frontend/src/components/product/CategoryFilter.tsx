@@ -39,11 +39,14 @@ const CategoryFilter: React.FC = () => {
     dispatch(setSelectedCategory(value));
     dispatch(fetchItems());
   };
-
+  const filterClass =
+    selectedCategory === null
+      ? "select is-fullwidth"
+      : "select is-fullwidth is-link";
   return (
     <div className="field">
       <div className="control">
-        <div className="select is-fullwidth">
+        <div className={filterClass}>
           <select
             value={selectedCategory ?? "null"}
             onChange={handleCategoryChange}

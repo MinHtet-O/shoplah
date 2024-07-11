@@ -14,7 +14,7 @@ const ConditionFilter: React.FC = () => {
   const [conditionOptions] = useState<
     { value: ItemCondition | null; label: string }[]
   >([
-    { value: null, label: "All Conditions" },
+    { value: null, label: "All" },
     { value: ItemCondition.NEW, label: "New" },
     { value: ItemCondition.ALMOST_NEW, label: "Almost New" },
     { value: ItemCondition.LIGHTLY_USED, label: "Lightly Used" },
@@ -32,11 +32,15 @@ const ConditionFilter: React.FC = () => {
     dispatch(setSelectedCondition(value));
     dispatch(fetchItems());
   };
+  const filterClass =
+    selectedCondition === null
+      ? "select is-fullwidth"
+      : "select is-fullwidth is-link";
 
   return (
     <div className="field">
       <div className="control">
-        <div className="select is-fullwidth">
+        <div className={filterClass}>
           <select
             value={selectedCondition ?? "null"}
             onChange={handleConditionChange}
