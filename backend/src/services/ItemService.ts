@@ -46,7 +46,7 @@ export class ItemService {
     }
 
     const order = sortField ? { [sortField]: sortOrder } : {};
-
+    console.log({ where, order });
     return this.itemRepository.find({
       where: where as any,
       order,

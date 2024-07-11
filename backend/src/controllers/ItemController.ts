@@ -18,8 +18,7 @@ import { Item } from "../entity/Item";
 import { AcceptOfferDto } from "../dtos/AcceptOfferDto";
 import { BuyItemDto } from "../dtos/BuyItemDto";
 
-interface ItemQueryParams {
-  filters?: Partial<Item>;
+interface ItemQueryParams extends Partial<Item> {
   sortField?: string;
   sortOrder?: "ASC" | "DESC";
 }
@@ -31,7 +30,8 @@ export class ItemController {
 
   @Get()
   getAll(@QueryParams() params: ItemQueryParams) {
-    const { filters = {}, sortField, sortOrder } = params;
+    const { sortField, sortOrder, ...filters } = params;
+    console.log(filters);
     return this.itemService.getAll(filters, sortField, sortOrder);
   }
 
