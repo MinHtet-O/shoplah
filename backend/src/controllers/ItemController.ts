@@ -18,14 +18,21 @@ import { Item } from "../entity/Item";
 import { AcceptOfferDto } from "../dtos/AcceptOfferDto";
 import { BuyItemDto } from "../dtos/BuyItemDto";
 
+interface ItemQueryParams {
+  filters?: Partial<Item>;
+  sortField?: string;
+  sortOrder?: "ASC" | "DESC";
+}
+
 @JsonController("/items")
 @Service()
 export class ItemController {
   constructor(private itemService: ItemService) {}
 
   @Get()
-  getAll(@QueryParams() params: Partial<Item>) {
-    return this.itemService.getAll(params);
+  getAll(@QueryParams() params: ItemQueryParams) {
+    const { filters = {}, sortField, sortOrder } = params;
+    return this.itemService.getAll(filters, sortField, sortOrder);
   }
 
   @Get("/:id")

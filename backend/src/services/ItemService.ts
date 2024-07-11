@@ -29,11 +29,13 @@ export class ItemService {
     this.userRepository = AppDataSource.getRepository(User);
   }
 
-  async getAll(filters: Partial<Item> = {}): Promise<Item[]> {
-    // Define the where object with a more flexible type
+  async getAll(
+    filters: Partial<Item> = {},
+    sortField?: string,
+    sortOrder?: "ASC" | "DESC"
+  ): Promise<Item[]> {
     const where: { [key: string]: any } = {};
 
-    // Process filters to handle _ne (not equal) and other operators
     for (const [key, value] of Object.entries(filters)) {
       const [field, operator] = key.split("-");
       if (operator === "ne") {
@@ -43,7 +45,12 @@ export class ItemService {
       }
     }
 
-    return this.itemRepository.find({ where: where as any });
+    const order = sortField ? { [sortField]: sortOrder } : {};
+
+    return this.itemRepository.find({
+      where: where as any,
+      order,
+    });
   }
 
   async getOne(id: number): Promise<Partial<Item>> {

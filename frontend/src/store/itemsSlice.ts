@@ -1,17 +1,15 @@
-// itemsSlice.ts
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { RootState } from "./store";
 import { Item, ItemDetail, FetchItemMode, ItemStatus } from "../types";
 import toast from "react-hot-toast";
-import { ViewType } from "./filterSlice";
+import { ViewType } from "../types";
 
 interface ItemState {
   items: Item[];
   itemDetail: ItemDetail | null;
   loading: boolean;
   error: string | null;
-  selectedCategory: number | null;
 }
 
 const initialState: ItemState = {
@@ -19,15 +17,16 @@ const initialState: ItemState = {
   itemDetail: null,
   loading: false,
   error: null,
-  selectedCategory: null,
 };
 
 export const fetchItems = createAsyncThunk(
   "items/fetchItems",
   async (_, { getState }) => {
     const state = getState() as RootState;
-    const viewType = state.filter.viewType; // Fetch viewType from state
-    const categoryId = state.items.selectedCategory;
+    const viewType = state.filter.viewType;
+    const categoryId = state.filter.selectedCategory;
+    const condition = state.filter.selectedCondition;
+    const sorting = state.filter.sorting;
     const userId = state.auth.userId;
     let url = "http://localhost:8080/items";
 
@@ -35,12 +34,30 @@ export const fetchItems = createAsyncThunk(
     if (categoryId !== null) {
       params.append("category_id", categoryId.toString());
     }
-
+    if (condition !== null) {
+      params.append("condition", condition);
+    }
     if (viewType === ViewType.BUY && userId !== null) {
       params.append("seller_id-ne", userId.toString());
       params.append("status", ItemStatus.AVAILABLE);
     } else if (viewType === ViewType.SELL && userId !== null) {
       params.append("seller_id", userId.toString());
+    }
+
+    if (sorting) {
+      if (sorting === "latest") {
+        params.append("sortField", "created_at");
+        params.append("sortOrder", "DESC");
+      } else if (sorting === "oldest") {
+        params.append("sortField", "created_at");
+        params.append("sortOrder", "ASC");
+      } else if (sorting === "price_high_to_low") {
+        params.append("sortField", "price");
+        params.append("sortOrder", "DESC");
+      } else if (sorting === "price_low_to_high") {
+        params.append("sortField", "price");
+        params.append("sortOrder", "ASC");
+      }
     }
 
     if (params.toString()) {
@@ -54,7 +71,7 @@ export const fetchItems = createAsyncThunk(
 
 export const fetchItemDetail = createAsyncThunk(
   "items/fetchItemDetail",
-  async (itemId: string, { getState }) => {
+  async (itemId: string) => {
     const response = await axios.get<ItemDetail>(
       `http://localhost:8080/items/${itemId}`
     );
@@ -104,11 +121,7 @@ export const buyItem = createAsyncThunk(
 const itemsSlice = createSlice({
   name: "items",
   initialState,
-  reducers: {
-    setSelectedCategory: (state, action) => {
-      state.selectedCategory = action.payload;
-    },
-  },
+  reducers: {},
   extraReducers: (builder) => {
     builder
       .addCase(fetchItems.pending, (state) => {
@@ -135,20 +148,7 @@ const itemsSlice = createSlice({
         state.loading = false;
         state.error = action.error.message || "Failed to fetch item detail";
       });
-    // .addCase(buyItem.pending, (state) => {
-    //   state.loading = true;
-    //   state.error = null;
-    // })
-    // .addCase(buyItem.fulfilled, (state, action) => {
-    //   state.loading = false;
-    //   state.itemDetail = action.payload;
-    // })
-    // .addCase(buyItem.rejected, (state, action) => {
-    //   state.loading = false;
-    //   state.error = action.payload as string;
-    // });
   },
 });
 
-export const { setSelectedCategory } = itemsSlice.actions;
 export default itemsSlice.reducer;

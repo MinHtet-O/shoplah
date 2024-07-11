@@ -33,7 +33,12 @@ export default function Index() {
 
   return (
     <div>
-      {!isAuthenticated && <Landing />} {isAuthenticated && <ProductCatalog />}{" "}
+      {!isAuthenticated && <Landing />}{" "}
+      {isAuthenticated && (
+        <div>
+          <ProductCatalog />
+        </div>
+      )}{" "}
     </div>
   );
 }

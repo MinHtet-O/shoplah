@@ -57,7 +57,16 @@ const Product: React.FC<ProductProps> = ({ item, onProductClick }) => {
           </figure>
         </div>
         <div className="card-content">
-          <p className="title is-6">{item.title}</p>
+          <div className="is-flex is-align-items-center">
+            <p className="title is-6 mb-0">{item.title}</p>
+            <span
+              className={`tag ${getConditionTagColor(
+                item.condition
+              )} is-light ml-2`}
+            >
+              {item.condition.replace("_", " ")}
+            </span>
+          </div>
           <p className="subtitle is-6">${item.price}</p>
           <p>{item.description}</p>
           <p className="is-size-7 has-text-grey mt-2">
@@ -69,6 +78,23 @@ const Product: React.FC<ProductProps> = ({ item, onProductClick }) => {
       </div>
     </div>
   );
+};
+
+const getConditionTagColor = (condition: string) => {
+  switch (condition) {
+    case "new":
+      return "is-success";
+    case "almost_new":
+      return "is-info";
+    case "lightly_used":
+      return "is-warning";
+    case "heavily_used":
+      return "is-danger";
+    case "refurbished":
+      return "is-primary";
+    default:
+      return "";
+  }
 };
 
 export default ProductList;

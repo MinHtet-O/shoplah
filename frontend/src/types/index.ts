@@ -3,6 +3,11 @@ export interface Category {
   name: string;
 }
 
+export enum ViewType {
+  BUY = "BUY",
+  SELL = "SELL",
+}
+
 export interface Seller {
   id: number;
   username: string;
@@ -15,6 +20,13 @@ export interface User {
   email: string;
 }
 
+export enum ItemCondition {
+  NEW = "new",
+  ALMOST_NEW = "amost_new",
+  LIGHTLY_USED = "lightly_used",
+  HEAVILY_USED = "heavily_used",
+  REFURBISHED = "refurbished",
+}
 export interface Offer {
   id: number;
   item_id: number;
@@ -36,12 +48,6 @@ export enum OfferStatus {
 export enum ItemStatus {
   AVAILABLE = "available",
   SOLD = "sold",
-}
-
-export enum ItemCondition {
-  NEW = "new",
-  USED = "used",
-  REFURBISHED = "refurbished",
 }
 
 export interface Item {

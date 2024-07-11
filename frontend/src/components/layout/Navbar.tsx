@@ -8,7 +8,8 @@ import logo from "../../../public/logo-icon.png";
 import { RootState } from "../../store/store";
 import { logout } from "../../store/authSlice";
 import { AppDispatch } from "../../store/store";
-import { ViewType, setViewType } from "../../store/filterSlice";
+import { setViewType } from "../../store/filterSlice";
+import { ViewType } from "@/types";
 import { fetchItems } from "@/store/itemsSlice";
 import { useRouter } from "next/navigation";
 
@@ -41,7 +42,7 @@ const Navbar: React.FC<NavbarProps> = ({ onLoginClick, onRegisterClick }) => {
 
   return (
     <nav
-      className="navbar is-white"
+      className="navbar is-white is-fixed-top"
       role="navigation"
       aria-label="main navigation"
     >
