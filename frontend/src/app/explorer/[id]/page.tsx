@@ -125,7 +125,10 @@ const ProductDetailBuyer: React.FC<{ productId: string }> = ({ productId }) => {
             )}
             <div className="columns">
               <div className="column is-three-quarters">
-                <ProductInfo product={product} />
+                <ProductInfo
+                  isOwner={product.seller_id === currUserId}
+                  product={product}
+                />
               </div>
               <div className="column is-one-quarter">
                 {!isSold && (

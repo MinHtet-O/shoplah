@@ -58,7 +58,7 @@ const OfferList: React.FC<OfferListProps> = ({ offers, onAcceptOffer }) => {
                   <p className="is-size-7 has-text-grey">
                     {formatDate(offer.created_at)}
                     {offer.id === highestPriceOffer.id && (
-                      <span className="tag is-warning ml-2 is-small ">
+                      <span className="has-text-weight-semibold tag is-warning ml-2 is-small ">
                         top offer
                       </span>
                     )}

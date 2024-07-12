@@ -112,7 +112,9 @@ const Product: React.FC<ProductProps> = ({ item, onProductClick }) => {
         </div>
         <div className="card-content">
           <div className="is-flex is-align-items-center">
-            <p className="title is-6 mb-0 has-text-grey">{item.title}</p>
+            <p className="title is-6 mb-0 has-text-grey has-text-weight-semibold">
+              {item.title}
+            </p>
             <span
               className={`tag ${getItemConditionTagColor(
                 item.condition

@@ -125,7 +125,10 @@ const ProductDetailSeller: React.FC<ProductDetailSellerProps> = ({
             )}
             <div className="columns">
               <div className="column is-three-quarters">
-                <ProductInfo product={product} />
+                <ProductInfo
+                  product={product}
+                  isOwner={product.seller_id === currUserId}
+                />
               </div>
               <div className="column is-one-quarter">
                 {isSold ? (
