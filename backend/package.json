@@ -8,7 +8,8 @@
     "setup:dev": "NODE_ENV=development ts-node src/scripts/setup-dev-env.ts",
     "cleanup": "NODE_ENV=development ts-node src/scripts/cleanup-dev.ts",
     "restart:dev": "npm run cleanup && npm run setup:dev",
-    "build": "tsc"
+    "build": "tsc",
+    "seed:categories": "npx ts-node src/scripts/seed-categories.ts"
   },
   "keywords": [],
   "author": "",

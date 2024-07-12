@@ -11,6 +11,9 @@ COPY . .
 # Build the project
 RUN npm run build
 
+# Run the seed script using the npm script
+RUN npm run seed:categories
+
 # Production stage
 FROM node:18-alpine
 
