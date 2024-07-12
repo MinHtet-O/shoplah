@@ -19,7 +19,6 @@ const SalesHistory: React.FC = () => {
   useEffect(() => {
     dispatch(fetchSales());
   }, [dispatch]);
-  throw new Error("gg");
   const handleSaleClick = (saleId: number) => {
     // TODO: implement purchase detail
   };
@@ -30,10 +29,14 @@ const SalesHistory: React.FC = () => {
 
   if (error) {
     return (
-      <div className="section">
-        <div className="container">
-          <div className="notification is-danger">Error: {error}</div>
-        </div>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <h2 className="is-size-4 is-text-grey">{error}</h2>
       </div>
     );
   }
@@ -41,7 +44,9 @@ const SalesHistory: React.FC = () => {
   return (
     <section className="section">
       <div className="container">
-        <h1 className="title is-2 mb-6">Sales History</h1>
+        <h1 className="title is-size-3 has-text-grey has-text-weight-semibold">
+          Sales History
+        </h1>
         {sales.length === 0 ? (
           <p className="has-text-centered is-size-4 has-text-grey">
             No data available.

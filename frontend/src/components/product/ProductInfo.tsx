@@ -39,7 +39,7 @@ const ProductInfo: React.FC<ProductInfoProps> = ({ product }) => {
             </div>
             <div className="column is-half">
               <p className="has-text-grey mb-1">Condition</p>
-              <p className="mt-0">{product.condition}</p>
+              <p className="mt-0">{product.condition.replace("_", " ")}</p>
             </div>
             <div className="column is-half">
               <p className="has-text-grey mb-1">Brand</p>

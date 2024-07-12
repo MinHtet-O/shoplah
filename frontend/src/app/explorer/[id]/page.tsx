@@ -59,21 +59,19 @@ const ProductDetailBuyer: React.FC<{ productId: string }> = ({ productId }) => {
   };
 
   if (loading) {
-    return (
-      <div className="section has-background-light">
-        <div className="container">
-          <LoadingSpinner></LoadingSpinner>
-        </div>
-      </div>
-    );
+    return <LoadingSpinner></LoadingSpinner>;
   }
 
   if (error) {
     return (
-      <div className="section has-background-light">
-        <div className="container">
-          <div className="notification is-danger">Error: {error}</div>
-        </div>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <h2 className="is-size-4 is-text-grey">{error}</h2>
       </div>
     );
   }
@@ -97,7 +95,7 @@ const ProductDetailBuyer: React.FC<{ productId: string }> = ({ productId }) => {
         <div className="card">
           <div className="card-content">
             {isBuyer && (
-              <div className="notification is-info is-light">
+              <div className="notification is-link is-light">
                 {product.purchase?.type === "offer_accepted" ? (
                   <>
                     Your bought this item for ${product.purchase!.price} on{" "}
@@ -128,49 +126,47 @@ const ProductDetailBuyer: React.FC<{ productId: string }> = ({ productId }) => {
                 <ProductInfo product={product} />
               </div>
               <div className="column is-one-quarter">
-                <div className="box">
-                  {!isSold && (
-                    <>
-                      <button
-                        className={`button is-primary is-fullwidth mb-4 ${
-                          buyItemLoading ? "is-loading" : ""
-                        }`}
-                        onClick={handleBuyClick}
+                {!isSold && (
+                  <>
+                    <button
+                      className={`button is-primary is-fullwidth mb-4 ${
+                        buyItemLoading ? "is-loading" : ""
+                      }`}
+                      onClick={handleBuyClick}
+                    >
+                      Buy
+                    </button>
+                    <MakeOffer
+                      productId={productId}
+                      initialOfferPrice={product.price - 1}
+                      onOfferSuccess={handleOfferSuccess}
+                      disabled={false}
+                    />
+                  </>
+                )}
+                {previousOffer && (
+                  <div className="notification mt-4 is-size-6">
+                    {`You offered `}
+                    <span className="has-text-weight-semibold">
+                      ${previousOffer.price}
+                    </span>
+                    {`, ${formatDistanceToNow(
+                      new Date(previousOffer.created_at)
+                    )} ago`}
+                    <br />
+                    <div className="mt-1">
+                      <a
+                        onClick={openOfferModal}
+                        style={{
+                          cursor: "pointer",
+                          textDecoration: "underline",
+                        }}
                       >
-                        Buy
-                      </button>
-                      <MakeOffer
-                        productId={productId}
-                        initialOfferPrice={product.price - 1}
-                        onOfferSuccess={handleOfferSuccess}
-                        disabled={false}
-                      />
-                    </>
-                  )}
-                  {previousOffer && (
-                    <div className="notification mt-4 is-size-6">
-                      {`You offered `}
-                      <span className="has-text-weight-semibold">
-                        ${previousOffer.price}
-                      </span>
-                      {`, ${formatDistanceToNow(
-                        new Date(previousOffer.created_at)
-                      )} ago`}
-                      <br />
-                      <div className="mt-1">
-                        <a
-                          onClick={openOfferModal}
-                          style={{
-                            cursor: "pointer",
-                            textDecoration: "underline",
-                          }}
-                        >
-                          View offer history
-                        </a>
-                      </div>
+                        View offer history
+                      </a>
                     </div>
-                  )}
-                </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>

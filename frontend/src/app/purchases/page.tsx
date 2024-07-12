@@ -30,10 +30,14 @@ const PurchaseHistory: React.FC = () => {
 
   if (error) {
     return (
-      <div className="section">
-        <div className="container">
-          <div className="notification is-danger">Error: {error}</div>
-        </div>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <h2 className="is-size-4 is-text-grey">{error}</h2>
       </div>
     );
   }
@@ -41,7 +45,9 @@ const PurchaseHistory: React.FC = () => {
   return (
     <section className="section">
       <div className="container">
-        <h1 className="title is-2 mb-6">Purchase History</h1>
+        <h1 className="title is-size-3 has-text-grey has-text-weight-semibold">
+          Purchase History
+        </h1>
         {purchases.length === 0 ? (
           <p className="has-text-centered is-size-4 has-text-grey">
             No data available

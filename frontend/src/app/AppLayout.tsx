@@ -50,7 +50,11 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   };
 
   return (
-    <div>
+    <ErrorBoundary
+      FallbackComponent={(props) => (
+        <ErrorFallback {...props} handleGoToHomePage={handleGoToHomePage} />
+      )}
+    >
       <Head>
         <title>ShopLah - Your Premier Online Marketplace</title>
         <link rel="icon" href="/favicon.ico" />
@@ -64,17 +68,8 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
         onRegisterClick={() => setIsRegisterModalActive(true)}
       />
       <main>
-        <div style={{ marginTop: "3rem" }}>
-          <ErrorBoundary
-            FallbackComponent={(props) => (
-              <ErrorFallback
-                {...props}
-                handleGoToHomePage={handleGoToHomePage}
-              />
-            )}
-          >
-            {children}
-          </ErrorBoundary>
+        <div className="has-background-light" style={{ marginTop: "3rem" }}>
+          {children}
         </div>
       </main>
       <Footer />
@@ -89,7 +84,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
         onClose={handleCloseRegisterModal}
         onSwitchToLogin={handleSwitchToLogin}
       />
-    </div>
+    </ErrorBoundary>
   );
 };
 

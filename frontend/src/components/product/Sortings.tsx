@@ -15,7 +15,9 @@ const Sortings: React.FC = () => {
   };
 
   const getButtonClass = (sorting: Sorting) => {
-    return `button ${activeSorting === sorting ? "is-link is-light" : ""}`;
+    return `button ${
+      activeSorting === sorting ? "is-link is-light is-normal" : "is-small"
+    }`;
   };
 
   return (

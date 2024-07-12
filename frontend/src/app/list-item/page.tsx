@@ -62,7 +62,9 @@ const CreateItemForm: React.FC = () => {
   return (
     <div className="container">
       <div className="section">
-        <h1 className="title">Create Item</h1>
+        <h1 className="title is-size-3 has-text-grey has-text-weight-semibold">
+          Upload Your Item
+        </h1>
         <form onSubmit={handleSubmit}>
           <div className="columns is-multiline">
             <div className="column is-half">
@@ -195,7 +197,7 @@ const CreateItemForm: React.FC = () => {
               }`}
               type="submit"
             >
-              Create
+              List Now
             </button>
           </div>
         </form>

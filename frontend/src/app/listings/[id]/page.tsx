@@ -59,21 +59,19 @@ const ProductDetailSeller: React.FC<ProductDetailSellerProps> = ({
   };
 
   if (itemLoading || offersLoading) {
-    return (
-      <div className="section has-background-light">
-        <div className="container">
-          <LoadingSpinner></LoadingSpinner>
-        </div>
-      </div>
-    );
+    return <LoadingSpinner></LoadingSpinner>;
   }
 
   if (itemError) {
     return (
-      <div className="section has-background-light">
-        <div className="container">
-          <div className="notification is-danger">Error: {itemError}</div>
-        </div>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <h2 className="is-size-4 is-text-grey">{itemError}</h2>
       </div>
     );
   }
@@ -100,7 +98,7 @@ const ProductDetailSeller: React.FC<ProductDetailSellerProps> = ({
         <div className="card">
           <div className="card-content">
             {isSold && isSeller && (
-              <div className="notification is-info is-light">
+              <div className="notification is-link is-light">
                 {product.purchase?.type === "direct_purchase" ? (
                   <>
                     You sold this item on{" "}
@@ -148,28 +146,26 @@ const ProductDetailSeller: React.FC<ProductDetailSellerProps> = ({
                   </>
                 ) : (
                   <>
-                    <div className="card">
-                      <div className="card-content">
-                        <OfferList
-                          offers={pendingOffers}
-                          onAcceptOffer={handleAcceptOffer}
+                    <div className="">
+                      <OfferList
+                        offers={pendingOffers}
+                        onAcceptOffer={handleAcceptOffer}
+                      />
+                      <button
+                        className="button is-text mt-4 p-0"
+                        onClick={handleShowModal}
+                        disabled={nonPendingOffers.length === 0}
+                      >
+                        View cancelled offers
+                      </button>
+                      {showModal && (
+                        <OfferModal
+                          title="Cancelled Offers"
+                          offers={nonPendingOffers}
+                          onClose={handleCloseModal}
+                          view={OfferView.SELLER}
                         />
-                        <button
-                          className="button is-text mt-4 p-0"
-                          onClick={handleShowModal}
-                          disabled={nonPendingOffers.length === 0}
-                        >
-                          View cancelled offers
-                        </button>
-                        {showModal && (
-                          <OfferModal
-                            title="Cancelled Offers"
-                            offers={nonPendingOffers}
-                            onClose={handleCloseModal}
-                            view={OfferView.SELLER}
-                          />
-                        )}
-                      </div>
+                      )}
                     </div>
                   </>
                 )}

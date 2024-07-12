@@ -40,8 +40,14 @@ const OfferList: React.FC<OfferListProps> = ({ offers, onAcceptOffer }) => {
       ) : (
         <ul style={{ maxHeight: "300px", overflowY: "scroll" }}>
           {sortedOffers.map((offer: Offer) => (
-            <li key={offer.id} className="mb-3">
-              <div className="is-flex is-align-items-center is-justify-content-space-between">
+            <li key={offer.id} className="mb-1">
+              <div
+                className={`p-2 ${
+                  offer.id === highestPriceOffer.id
+                    ? "has-background-light"
+                    : ""
+                } is-flex is-align-items-center is-justify-content-space-between`}
+              >
                 <div>
                   <p className="is-size-6">
                     <span className="has-text-weight-bold has-text-grey">
@@ -52,12 +58,14 @@ const OfferList: React.FC<OfferListProps> = ({ offers, onAcceptOffer }) => {
                   <p className="is-size-7 has-text-grey">
                     {formatDate(offer.created_at)}
                     {offer.id === highestPriceOffer.id && (
-                      <span className="tag is-warning ml-2">best deal</span>
+                      <span className="tag is-warning ml-2 is-small ">
+                        top offer
+                      </span>
                     )}
                   </p>
                 </div>
                 <button
-                  className="button is-text is-small"
+                  className={`button is-text is-small`}
                   onClick={() => onAcceptOffer(offer.id)}
                 >
                   Accept
