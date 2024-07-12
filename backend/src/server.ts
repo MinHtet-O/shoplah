@@ -13,10 +13,22 @@ import { OptionalAuthMiddleware } from "./middleware/optionalAuth";
 import { PurchaseController } from "./controllers/PurchaseController";
 import { DelayMiddleware } from "./middleware/delayMiddleware";
 import express, { Request, Response, NextFunction } from "express";
+import fs from "fs";
 import path from "path";
 import dotenv from "dotenv";
 dotenv.config();
 useContainer(Container);
+
+async function ensureDirectoriesExist() {
+  const directories = ["./upload", "./temp"];
+
+  directories.forEach((dir) => {
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+      console.log(`Directory ${dir} created.`);
+    }
+  });
+}
 
 async function startServer() {
   try {
@@ -75,5 +87,10 @@ async function startFileServer() {
   });
 }
 
-startServer();
-startFileServer();
+async function init() {
+  await ensureDirectoriesExist();
+  startServer();
+  startFileServer();
+}
+
+init();
