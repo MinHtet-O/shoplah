@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
+    "install:all": "concurrently \"npm install --prefix frontend\" \"npm install --prefix backend\"",
     "dev": "concurrently \"npm run dev --prefix frontend\" \"npm run dev --prefix backend\"",
     "build": "concurrently \"npm run build --prefix frontend\" \"npm run build --prefix backend\"",
     "start": "concurrently \"npm run start --prefix frontend\" \"npm run start --prefix backend\""
@@ -13,12 +14,7 @@
   "description": "",
   "devDependencies": {
     "@types/jsonwebtoken": "^9.0.6",
-    "concurrently": "^8.2.2"
-  },
-  "dependencies": {
-    "bcrypt": "^5.1.1",
-    "date-fns": "^3.6.0",
-    "jsonwebtoken": "^9.0.2",
-    "react-select": "^5.8.0"
+    "concurrently": "^8.2.2",
+    "docker-compose": "^0.24.8"
   }
 }
