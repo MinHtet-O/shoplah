@@ -53,7 +53,7 @@ const CreateItemForm: React.FC = () => {
     }
 
     const resultAction = await dispatch(createItem(formData));
-    console.log(resultAction);
+
     if (createItem.fulfilled.match(resultAction)) {
       router.push("/");
     }

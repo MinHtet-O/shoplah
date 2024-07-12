@@ -107,7 +107,6 @@ const authSlice = createSlice({
       state.initializing = false; // Set initializing to false when done
       try {
         const decodedToken = jwtDecode<DecodedToken>(action.payload.token);
-        console.log({ decodedToken });
         state.userId = decodedToken.userId;
         state.userName = decodedToken.userName;
       } catch (error) {

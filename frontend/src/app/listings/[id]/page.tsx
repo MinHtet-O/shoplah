@@ -93,7 +93,6 @@ const ProductDetailSeller: React.FC<ProductDetailSellerProps> = ({
 
   const pendingOffers = offers.filter((offer) => offer.status === "pending");
   const nonPendingOffers = offers.filter((offer) => offer.status !== "pending");
-  console.log({ nonPendingOffers });
   return (
     <section className="section">
       <div className="container" style={{ maxWidth: "1400px" }}>

@@ -26,8 +26,15 @@ export const seedOffers = async () => {
     // Filter users to exclude the seller
     const potentialBuyers = users.filter((user) => user.id !== item.seller_id);
 
+    // Track users who have already made an offer for this item
+    const usersWithOffers = new Set<number>();
+
     for (let i = 0; i < numOffers; i++) {
       const user = faker.helpers.arrayElement(potentialBuyers);
+
+      // Skip if this user has already made an offer for this item
+      if (usersWithOffers.has(user.id)) continue;
+
       const price = faker.number.int({ min: 1, max: item.price - 1 });
 
       // Check if an existing offer by the same user for the same item exists
@@ -35,7 +42,6 @@ export const seedOffers = async () => {
         where: {
           item: { id: item.id },
           user: { id: user.id },
-          status: OfferStatus.PENDING,
         },
       });
 
@@ -45,25 +51,17 @@ export const seedOffers = async () => {
         await offerRepository.save(existingOffer);
       }
 
-      // Check again if there is any pending offer by the same user for the same item
-      const pendingOffer = await offerRepository.findOne({
-        where: {
-          item: { id: item.id },
-          user: { id: user.id },
-          status: OfferStatus.PENDING,
-        },
+      // Create the new offer
+      const newOffer = offerRepository.create({
+        item: item,
+        user: user,
+        price: price,
+        status: OfferStatus.PENDING,
       });
+      offers.push(newOffer);
 
-      if (!pendingOffer) {
-        // Create the new offer only if there is no pending offer
-        const newOffer = offerRepository.create({
-          item: item,
-          user: user,
-          price: price,
-          status: OfferStatus.PENDING,
-        });
-        offers.push(newOffer);
-      }
+      // Mark this user as having made an offer for this item
+      usersWithOffers.add(user.id);
     }
   }
 

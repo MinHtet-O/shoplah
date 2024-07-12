@@ -90,7 +90,6 @@ const ProductDetailBuyer: React.FC<{ productId: string }> = ({ productId }) => {
 
   const isSold = product.status === "sold";
   const isBuyer = product.purchase && product.purchase.buyer_id === currUserId;
-  console.log({ buyItemLoading });
   return (
     <section className="section has-background-light">
       <div className="container" style={{ maxWidth: "1400px" }}>

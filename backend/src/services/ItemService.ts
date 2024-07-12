@@ -69,7 +69,6 @@ export class ItemService {
     }
 
     const order = sortField ? { [sortField]: sortOrder } : {};
-    console.log({ where, order });
     const items = await this.itemRepository.find({
       where: where as any,
       order,
@@ -202,8 +201,7 @@ export class ItemService {
       if (!item) {
         throw new NotFoundError("Item not found for this offer");
       }
-      console.log("Seller_ID", item.seller_id);
-      console.log("User_ID", userId);
+
       if (item.seller_id !== userId) {
         throw new ForbiddenError(
           "only the seller can accept offers for this item"

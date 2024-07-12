@@ -38,7 +38,7 @@ export async function seedItems() {
         category_id: randomCategory.id,
         title: faker.commerce.productName(),
         description: faker.lorem.sentence(),
-        price: faker.number.int({ min: 1, max: 100 }),
+        price: faker.number.int({ min: 5, max: 100 }),
         status: ItemStatus.AVAILABLE,
         condition: randomCondition,
         brand: faker.company.name(),

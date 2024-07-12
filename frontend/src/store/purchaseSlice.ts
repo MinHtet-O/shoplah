@@ -22,8 +22,6 @@ export const fetchPurchases = createAsyncThunk(
       );
       return response.data;
     } catch (err) {
-      console.log("purchaseSlice error handling");
-      console.log(err);
       let errMsg = (err as any).response?.data?.message;
       if (errMsg) {
         throw new Error(errMsg);
