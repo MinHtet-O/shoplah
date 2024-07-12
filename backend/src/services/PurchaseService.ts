@@ -21,7 +21,10 @@ export class PurchaseService {
       { ...filters, seller_id: userId },
     ];
 
-    return this.purchaseRepository.find({ where });
+    return this.purchaseRepository.find({
+      where,
+      relations: ["buyer", "seller", "item"],
+    });
   }
 
   async getOne(id: number, userId: number): Promise<Purchase> {

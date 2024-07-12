@@ -35,7 +35,7 @@ export default function Index() {
     <div>
       {!isAuthenticated && <Landing />}{" "}
       {isAuthenticated && (
-        <div>
+        <div className="has-background-light">
           <ProductCatalog />
         </div>
       )}{" "}

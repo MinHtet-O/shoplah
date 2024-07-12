@@ -92,7 +92,7 @@ const ProductDetailBuyer: React.FC<{ productId: string }> = ({ productId }) => {
   const isBuyer = product.purchase && product.purchase.buyer_id === currUserId;
   console.log({ buyItemLoading });
   return (
-    <div className="section has-background-light">
+    <section className="section has-background-light">
       <div className="container" style={{ maxWidth: "1400px" }}>
         <div className="card">
           <div className="card-content">
@@ -184,7 +184,7 @@ const ProductDetailBuyer: React.FC<{ productId: string }> = ({ productId }) => {
           view={OfferView.BUYER}
         />
       )}
-    </div>
+    </section>
   );
 };
 

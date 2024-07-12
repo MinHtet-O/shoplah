@@ -22,6 +22,7 @@ async function startServer() {
     await AppDataSource.initialize();
 
     const app = createExpressServer({
+      cors: true,
       controllers: [
         ItemController,
         UserController,

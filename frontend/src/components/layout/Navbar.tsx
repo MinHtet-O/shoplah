@@ -19,11 +19,14 @@ interface NavbarProps {
 }
 
 const Navbar: React.FC<NavbarProps> = ({ onLoginClick, onRegisterClick }) => {
-  const { isAuthenticated } = useSelector((state: RootState) => state.auth);
+  const { isAuthenticated, userName } = useSelector(
+    (state: RootState) => state.auth
+  );
   const { viewType } = useSelector((state: RootState) => state.filter);
   const dispatch = useDispatch<AppDispatch>();
   const pathname = usePathname();
   const router = useRouter();
+
   const handleLogout = () => {
     dispatch(logout());
   };
@@ -47,7 +50,7 @@ const Navbar: React.FC<NavbarProps> = ({ onLoginClick, onRegisterClick }) => {
       aria-label="main navigation"
     >
       <div className="container">
-        <div className="navbar-brand p-0">
+        <div className="navbar-brand p-2">
           <Link href={"/"} className={`navbar-item ${styles.navbarBrand}`}>
             <Image height={35} src={logo} alt="ShopLah Logo" />
             <span className={`has-text-primary ${styles.navbarText}`}>
@@ -98,18 +101,38 @@ const Navbar: React.FC<NavbarProps> = ({ onLoginClick, onRegisterClick }) => {
                 )}
                 {isAuthenticated && (
                   <>
-                    <Link href="/sell" className="button is-primary is-light">
+                    <Link
+                      href="/list-item"
+                      className="button is-primary is-light"
+                    >
                       <span className="icon">
                         <i className="fas fa-dollar-sign"></i>
                       </span>
                       <span>Sell</span>
                     </Link>
-                    <button className="button is-light" onClick={handleLogout}>
-                      <span className="icon">
-                        <i className="fas fa-arrow-right-from-bracket"></i>
-                      </span>
-                      <span>Logout</span>
-                    </button>
+                    <div className="navbar-item has-dropdown is-hoverable">
+                      <a className="navbar-link">
+                        <span className="icon">
+                          <i className="fa-regular fa-user"></i>
+                        </span>
+                        <span>{userName}</span>
+                      </a>
+                      <div className="navbar-dropdown">
+                        <Link href="/purchase-history" className="navbar-item">
+                          <span>My Purchases</span>
+                        </Link>
+                        <Link href="/sales-history" className="navbar-item">
+                          <span>Sales History</span>
+                        </Link>
+                        <hr className="navbar-divider" />
+                        <button className="navbar-item" onClick={handleLogout}>
+                          <span className="icon">
+                            <i className="fas fa-arrow-right-from-bracket"></i>
+                          </span>
+                          <span>Logout</span>
+                        </button>
+                      </div>
+                    </div>
                   </>
                 )}
               </div>

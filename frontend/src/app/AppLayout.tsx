@@ -61,7 +61,9 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
         onLoginClick={() => setIsLoginModalActive(true)}
         onRegisterClick={() => setIsRegisterModalActive(true)}
       />
-      <main>{children}</main>
+      <main>
+        <div style={{ marginTop: "3rem" }}>{children}</div>
+      </main>
       <Footer />
       <LoginModal
         isActive={isLoginModalActive}

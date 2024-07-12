@@ -10,6 +10,7 @@ import {
   CurrentUser,
   Authorized,
   UseBefore,
+  Body,
 } from "routing-controllers";
 import { Service } from "typedi";
 import { ItemService } from "../services/ItemService";
@@ -62,15 +63,16 @@ export class ItemController {
 
   @Authorized()
   @Post("/buy")
-  async buyItem(@Req() req: Request, @CurrentUser() user: User) {
-    const buyItemDto: BuyItemDto = JSON.parse(req.body.data);
+  async buyItem(@Body() buyItemDto: BuyItemDto, @CurrentUser() user: User) {
     return this.itemService.buyItem(buyItemDto.item_id, user.id);
   }
 
   @Authorized()
   @Post("/accept-offer")
-  async acceptOffer(@Req() req: Request, @CurrentUser() user: User) {
-    const acceptOfferDto: AcceptOfferDto = JSON.parse(req.body.data);
-    return this.itemService.acceptOffer(acceptOfferDto.offer_id, user.id);
+  async acceptOffer(
+    @Body() acceptOffer: AcceptOfferDto,
+    @CurrentUser() user: User
+  ) {
+    return this.itemService.acceptOffer(acceptOffer.offer_id, user.id);
   }
 }

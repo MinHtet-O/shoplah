@@ -18,6 +18,7 @@ interface ErrorResponse {
 
 interface DecodedToken extends JwtPayload {
   userId: number;
+  userName: string;
   // add other fields if present in your token
 }
 
@@ -71,6 +72,7 @@ interface AuthState {
   isLoading: boolean;
   error: ErrorResponse | null;
   userId: number | null;
+  userName: string | null;
   initializing: boolean; // New state for initialization
 }
 
@@ -80,6 +82,7 @@ const initialState: AuthState = {
   isLoading: false,
   error: null,
   userId: null,
+  userName: null,
   initializing: true, // Initializing state starts as true
 };
 
@@ -103,7 +106,9 @@ const authSlice = createSlice({
       state.initializing = false; // Set initializing to false when done
       try {
         const decodedToken = jwtDecode<DecodedToken>(action.payload.token);
+        console.log({ decodedToken });
         state.userId = decodedToken.userId;
+        state.userName = decodedToken.userName;
       } catch (error) {
         state.error = {
           status: "error",

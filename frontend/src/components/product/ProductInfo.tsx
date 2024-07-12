@@ -11,13 +11,14 @@ const ProductInfo: React.FC<ProductInfoProps> = ({ product }) => {
   const listingTimeAgo = formatDistanceToNow(new Date(product.created_at), {
     addSuffix: true,
   });
+  console.log(product.image);
   const isSold = product.status === "sold";
   return (
     <div className="columns">
       <div className="column is-half">
         <figure className="image is-square">
           <Image
-            src={product.photo || "/images/feature1.png"}
+            src={product.image || "https://via.placeholder.com/250x150"}
             alt="Product Image"
             width={800}
             height={800}

@@ -95,7 +95,7 @@ const ProductDetailSeller: React.FC<ProductDetailSellerProps> = ({
   const nonPendingOffers = offers.filter((offer) => offer.status !== "pending");
   console.log({ nonPendingOffers });
   return (
-    <div className="section has-background-light">
+    <section className="section">
       <div className="container" style={{ maxWidth: "1400px" }}>
         <div className="card">
           <div className="card-content">
@@ -178,7 +178,7 @@ const ProductDetailSeller: React.FC<ProductDetailSellerProps> = ({
           </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 };
 

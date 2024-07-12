@@ -8,6 +8,23 @@ export enum ViewType {
   SELL = "SELL",
 }
 
+export interface Purchase {
+  id: number;
+  item_id: number;
+  buyer_id: number;
+  buyer: User;
+  seller: User;
+  item: Item;
+  seller_id: number;
+  price: number;
+  type: PurchaseType;
+  purchased_at: string;
+}
+
+export enum PurchaseType {
+  DIRECT_PURCHASE = "direct_purchase",
+  OFFER_ACCEPTED = "offer_accepted",
+}
 export interface Seller {
   id: number;
   username: string;
@@ -62,21 +79,7 @@ export interface Item {
   brand: string;
   created_at: string;
   updated_at: string;
-  photo?: string;
-}
-
-export enum PurchaseType {
-  DIRECT_PURCHASE = "direct_purchase",
-  OFFER_ACCEPTED = "offer_accepted",
-}
-export interface Purchase {
-  id: number;
-  item_id: number;
-  buyer_id: number;
-  seller_id: number;
-  price: number;
-  type: string;
-  purchased_at: string;
+  image: string;
 }
 
 export interface ItemDetail extends Item {

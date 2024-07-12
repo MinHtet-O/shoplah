@@ -27,13 +27,13 @@ const ProductCatalog: React.FC = () => {
 
   return (
     <div className="container">
-      <div className="section">
-        <div className="columns mt-6">
-          <div className="column is-half">
+      <div className="section pl-2 pr-2">
+        <div className="columns">
+          <div className="column p-100-mobile">
             <Filters /> {/* Use the Filters component */}
           </div>
-          <div className="column is-half">
-            <Sortings /> {/* Use the Sortings component */}
+          <div className="column">
+            <Sortings />
           </div>
         </div>
         <ProductList

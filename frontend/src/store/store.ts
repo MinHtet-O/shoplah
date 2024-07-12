@@ -4,7 +4,7 @@ import categoriesReducer from "./categorysSlice";
 import offersReducer from "./offersSlice";
 import authReducer from "./authSlice";
 import filterReduce from "./filterSlice";
-
+import purchaseReducer from "./purchaseSlice";
 const store = configureStore({
   reducer: {
     items: itemsReducer,
@@ -12,6 +12,7 @@ const store = configureStore({
     offers: offersReducer,
     auth: authReducer,
     filter: filterReduce,
+    purchase: purchaseReducer,
   },
 });
 

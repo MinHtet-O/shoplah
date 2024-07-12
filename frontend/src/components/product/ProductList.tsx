@@ -5,14 +5,21 @@ import { RootState } from "@/store/store";
 import { Item } from "@/types";
 import Image from "next/image";
 import { formatDistanceToNow } from "date-fns";
-import ClipLoader from "react-spinners/ClipLoader";
 import LoadingSpinner from "../loading/LoadingSpinner";
+import { getItemConditionTagColor } from "@/utils/tagColors";
 
 interface ProductListProps {
   items: Item[];
   isLoading: boolean;
   isError: boolean;
 }
+
+const truncateDescription = (description: string, maxLength: number) => {
+  if (description.length <= maxLength) {
+    return description;
+  }
+  return description.slice(0, maxLength) + "...";
+};
 
 const ProductList: React.FC<ProductListProps> = ({
   items,
@@ -91,7 +98,7 @@ const Product: React.FC<ProductProps> = ({ item, onProductClick }) => {
         <div className="card-image">
           <figure className="image is-4by3">
             <Image
-              src={item.photo || "https://via.placeholder.com/250x150"}
+              src={item.image || "https://via.placeholder.com/250x150"}
               alt={item.title}
               width={250}
               height={150}
@@ -101,17 +108,19 @@ const Product: React.FC<ProductProps> = ({ item, onProductClick }) => {
         </div>
         <div className="card-content">
           <div className="is-flex is-align-items-center">
-            <p className="title is-6 mb-0">{item.title}</p>
+            <p className="title is-6 mb-0 has-text-grey">{item.title}</p>
             <span
-              className={`tag ${getConditionTagColor(
+              className={`tag ${getItemConditionTagColor(
                 item.condition
               )} is-light ml-2`}
             >
               {item.condition.replace("_", " ")}
             </span>
           </div>
-          <p className="subtitle is-6">${item.price}</p>
-          <p>{item.description}</p>
+          <p className="mt-2 mb-2 is-8 has-text-grey has-text-weight-semibold">
+            ${item.price}
+          </p>
+          <p>{truncateDescription(item.description, 100)}</p>
           <p className="is-size-7 has-text-grey mt-2">
             {formatDistanceToNow(new Date(item.created_at), {
               addSuffix: true,
@@ -121,23 +130,6 @@ const Product: React.FC<ProductProps> = ({ item, onProductClick }) => {
       </div>
     </div>
   );
-};
-
-const getConditionTagColor = (condition: string) => {
-  switch (condition) {
-    case "new":
-      return "is-success";
-    case "almost_new":
-      return "is-info";
-    case "lightly_used":
-      return "is-warning";
-    case "heavily_used":
-      return "is-danger";
-    case "refurbished":
-      return "is-primary";
-    default:
-      return "";
-  }
 };
 
 export default ProductList;

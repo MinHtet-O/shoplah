@@ -1,9 +1,8 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { RootState } from "./store";
-import { Item, ItemDetail, ItemStatus, Sorting } from "../types";
+import { Item, ItemDetail, ItemStatus, Sorting, ViewType } from "../types";
 import toast from "react-hot-toast";
-import { ViewType } from "../types";
 
 interface ItemState {
   items: Item[];
@@ -11,6 +10,8 @@ interface ItemState {
   loading: boolean;
   error: string | null;
   buyItemLoading: boolean;
+  createItemLoading: boolean;
+  createItemError: string | null;
 }
 
 const initialState: ItemState = {
@@ -19,7 +20,48 @@ const initialState: ItemState = {
   itemDetail: null,
   loading: false,
   error: null,
+  createItemLoading: false,
+  createItemError: null,
 };
+
+export const createItem = createAsyncThunk(
+  "items/createItem",
+  async (itemData: FormData, { getState, rejectWithValue }) => {
+    const state = getState() as RootState;
+    const token = state.auth.token;
+
+    try {
+      const response = await axios.post(
+        "http://localhost:8080/items",
+        itemData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      toast.success("Item created successfully!");
+      return response.data;
+    } catch (error: any) {
+      const createItemFailedErrMsg = "Failed to create item";
+      if (
+        error.response &&
+        error.response.data &&
+        error.response.data.message
+      ) {
+        toast.error(`${error.response.data.message}`);
+        return rejectWithValue(error.response.data.message);
+      } else if (error.response && error.response.status === 500) {
+        toast.error(createItemFailedErrMsg);
+        return rejectWithValue("Internal server error");
+      } else {
+        toast.error(createItemFailedErrMsg);
+        return rejectWithValue("Failed to create item");
+      }
+    }
+  }
+);
 
 export const fetchItems = createAsyncThunk(
   "items/fetchItems",
@@ -155,6 +197,17 @@ const itemsSlice = createSlice({
       })
       .addCase(buyItem.rejected, (state, action) => {
         state.buyItemLoading = false;
+      })
+      .addCase(createItem.pending, (state) => {
+        state.createItemLoading = true;
+        state.createItemError = null;
+      })
+      .addCase(createItem.fulfilled, (state, action) => {
+        state.createItemLoading = false;
+      })
+      .addCase(createItem.rejected, (state, action) => {
+        state.createItemLoading = false;
+        state.createItemError = action.payload as string;
       });
   },
 });
