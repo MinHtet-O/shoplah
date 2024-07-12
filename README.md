@@ -29,27 +29,39 @@ As a prerequisite, you need to install Docker and docker-compose. To set up the 
    npm i
    ```
 
-2. Build Docker containers:
+2. Add the following variables to the root `.env` file:
+
+```
+DB_HOST=db
+DB_PORT=5432
+DB_USERNAME=postgres
+DB_PASSWORD=postgres
+DB_NAME=shoplah
+```
+
+3. Build Docker containers:
 
    ```
    docker-compose build
    ```
 
-3. Start the Docker containers:
+4. Start the Docker containers:
 
    ```
    docker-compose up
    ```
 
+> [!WARNING]  
+> After the setup, you need to connect the postgres dockercontainer running on localhost:5432 and populate the product categories table yourself in this setup. So, we recommend local setup currently.
 
-## Local Setup
+## Local Setup ( Recommend )
 
 For a local setup, ensure you have PostgreSQL installed and running on `localhost:5432`. Then follow these steps:
 
 1. From the project root directory, install all dependencies:
 
    ```
-    npm run install:all
+    npm i && npm run install:all
    ```
 
 2. Seed the database with initial data. You have two options:
@@ -71,7 +83,6 @@ For a local setup, ensure you have PostgreSQL installed and running on `localhos
    ```
    npm run dev
    ```
-
 
 ## Testing
 
