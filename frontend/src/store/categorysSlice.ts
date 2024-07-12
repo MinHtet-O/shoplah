@@ -1,3 +1,4 @@
+import { BACKEND_URL } from "@/utils/loadBackendUrl";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
@@ -21,9 +22,7 @@ const initialState: CategoryState = {
 export const fetchCategories = createAsyncThunk(
   "categories/fetchCategories",
   async () => {
-    const response = await axios.get<Category[]>(
-      "http://localhost:8080/categories"
-    );
+    const response = await axios.get<Category[]>(`${BACKEND_URL}/categories`);
     return response.data;
   }
 );

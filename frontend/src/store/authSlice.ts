@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios, { AxiosError } from "axios";
 import { JwtPayload, jwtDecode } from "jwt-decode";
 import { AppDispatch } from "./store";
+import { BACKEND_URL } from "@/utils/loadBackendUrl";
 
 interface AuthResponse {
   token: string;
@@ -29,7 +30,7 @@ export const login = createAsyncThunk<
 >("auth/login", async (credentials, { rejectWithValue }) => {
   try {
     const response = await axios.post<AuthResponse>(
-      "http://localhost:8080/auth/login",
+      `${BACKEND_URL}/auth/login`,
       credentials
     );
     return response.data;
@@ -52,7 +53,7 @@ export const register = createAsyncThunk<
   { rejectValue: ErrorResponse }
 >("auth/register", async (userData, { rejectWithValue }) => {
   try {
-    await axios.post("http://localhost:8080/auth/register", userData);
+    await axios.post(`${BACKEND_URL}/auth/register`, userData);
   } catch (error) {
     const axiosError = error as AxiosError<ErrorResponse>;
     if (axiosError.response?.data) {

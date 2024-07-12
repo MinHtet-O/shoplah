@@ -5,6 +5,7 @@ import axios from "axios";
 import { RootState } from "./store";
 import { Offer } from "../types";
 import toast from "react-hot-toast";
+import { BACKEND_URL } from "@/utils/loadBackendUrl";
 
 interface OfferState {
   offers: Offer[];
@@ -29,7 +30,7 @@ export const makeOffer = createAsyncThunk(
 
     try {
       const response = await axios.post(
-        "http://localhost:8080/offers",
+        `${BACKEND_URL}/offers`,
         { item_id, price },
         {
           headers: {
@@ -65,7 +66,7 @@ export const acceptOffer = createAsyncThunk(
     const token = state.auth.token;
     try {
       const response = await axios.post(
-        "http://localhost:8080/items/accept-offer",
+        `${BACKEND_URL}/items/accept-offer`,
         { offer_id },
         {
           headers: {
@@ -102,7 +103,7 @@ export const fetchOffersByItemId = createAsyncThunk(
 
     try {
       const response = await axios.get(
-        `http://localhost:8080/offers?item_id=${item_id}`,
+        `${BACKEND_URL}/offers?item_id=${item_id}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

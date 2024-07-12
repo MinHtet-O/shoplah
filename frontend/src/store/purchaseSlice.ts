@@ -3,6 +3,7 @@ import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import { Purchase } from "@/types";
 import { RootState } from "./store";
 import axios from "axios";
+import { BACKEND_URL } from "@/utils/loadBackendUrl";
 
 export const fetchPurchases = createAsyncThunk(
   "purchase/fetchPurchases",
@@ -11,7 +12,7 @@ export const fetchPurchases = createAsyncThunk(
     const token = auth.token;
     console.log("before fetch");
     const response = await axios.get(
-      `http://localhost:8080/purchases?buyer_id=${auth.userId}`,
+      `${BACKEND_URL}/purchases?buyer_id=${auth.userId}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -29,7 +30,7 @@ export const fetchSales = createAsyncThunk(
     const { auth } = getState() as RootState;
     const token = auth.token;
     const response = await axios.get(
-      `http://localhost:8080/purchases?seller_id=${auth.userId}`,
+      `${BACKEND_URL}/purchases?seller_id=${auth.userId}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,

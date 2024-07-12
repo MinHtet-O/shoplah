@@ -3,7 +3,7 @@ import axios from "axios";
 import { RootState } from "./store";
 import { Item, ItemDetail, ItemStatus, Sorting, ViewType } from "../types";
 import toast from "react-hot-toast";
-
+import { BACKEND_URL } from "@/utils/loadBackendUrl";
 interface ItemState {
   items: Item[];
   itemDetail: ItemDetail | null;
@@ -31,16 +31,12 @@ export const createItem = createAsyncThunk(
     const token = state.auth.token;
 
     try {
-      const response = await axios.post(
-        "http://localhost:8080/items",
-        itemData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
+      const response = await axios.post(`${BACKEND_URL}/items`, itemData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
+      });
       toast.success("Item created successfully!");
       return response.data;
     } catch (error: any) {
@@ -62,7 +58,6 @@ export const createItem = createAsyncThunk(
     }
   }
 );
-
 export const fetchItems = createAsyncThunk(
   "items/fetchItems",
   async (_, { getState }) => {
@@ -72,7 +67,7 @@ export const fetchItems = createAsyncThunk(
     const condition = state.filter.selectedCondition;
     const sorting = state.filter.sorting;
     const userId = state.auth.userId;
-    let url = "http://localhost:8080/items";
+    let url = `${BACKEND_URL}/items`;
 
     const params = new URLSearchParams();
     if (categoryId !== null) {
@@ -114,7 +109,7 @@ export const fetchItemDetail = createAsyncThunk(
   "items/fetchItemDetail",
   async (itemId: string) => {
     const response = await axios.get<ItemDetail>(
-      `http://localhost:8080/items/${itemId}`
+      `${BACKEND_URL}/items/${itemId}`
     );
     return response.data;
   }
@@ -128,7 +123,7 @@ export const buyItem = createAsyncThunk(
 
     try {
       const response = await axios.post(
-        "http://localhost:8080/items/buy",
+        `${BACKEND_URL}/items/buy`,
         { item_id: itemId },
         {
           headers: {
