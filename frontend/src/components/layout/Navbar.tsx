@@ -118,10 +118,10 @@ const Navbar: React.FC<NavbarProps> = ({ onLoginClick, onRegisterClick }) => {
                         <span>{userName}</span>
                       </a>
                       <div className="navbar-dropdown">
-                        <Link href="/purchase-history" className="navbar-item">
+                        <Link href="/purchases" className="navbar-item">
                           <span>My Purchases</span>
                         </Link>
-                        <Link href="/sales-history" className="navbar-item">
+                        <Link href="/sales" className="navbar-item">
                           <span>Sales History</span>
                         </Link>
                         <hr className="navbar-divider" />
