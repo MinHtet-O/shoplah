@@ -75,7 +75,8 @@ export class ItemService {
       order,
     });
 
-    const baseFileServerUrl = "http://localhost:8081"; // Replace with your base URL
+    const baseFileServerUrl =
+      process.env.FILE_SERVER_BASE_URL || "http://localhost:8081"; // Replace with your base URL
 
     return items.map((item) => {
       if (item.image) {

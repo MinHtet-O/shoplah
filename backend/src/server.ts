@@ -14,7 +14,8 @@ import { PurchaseController } from "./controllers/PurchaseController";
 import { DelayMiddleware } from "./middleware/delayMiddleware";
 import express, { Request, Response, NextFunction } from "express";
 import path from "path";
-
+import dotenv from "dotenv";
+dotenv.config();
 useContainer(Container);
 
 async function startServer() {
