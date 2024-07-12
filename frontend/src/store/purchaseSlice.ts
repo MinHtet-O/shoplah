@@ -4,42 +4,58 @@ import { Purchase } from "@/types";
 import { RootState } from "./store";
 import axios from "axios";
 import { BACKEND_URL } from "@/utils/loadBackendUrl";
+import toast from "react-hot-toast";
 
 export const fetchPurchases = createAsyncThunk(
   "purchase/fetchPurchases",
   async (_, { getState }) => {
-    const { auth } = getState() as RootState;
-    const token = auth.token;
-    console.log("before fetch");
-    const response = await axios.get(
-      `${BACKEND_URL}/purchases?buyer_id=${auth.userId}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+    try {
+      const { auth } = getState() as RootState;
+      const token = auth.token;
+      const response = await axios.get(
+        `${BACKEND_URL}/purchases?buyer_id=${auth.userId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (err) {
+      console.log("purchaseSlice error handling");
+      console.log(err);
+      let errMsg = (err as any).response?.data?.message;
+      if (errMsg) {
+        throw new Error(errMsg);
       }
-    );
-
-    return response.data;
+      throw err;
+    }
   }
 );
 
 export const fetchSales = createAsyncThunk(
   "purchase/fetchSales",
   async (_, { getState }) => {
-    const { auth } = getState() as RootState;
-    const token = auth.token;
-    const response = await axios.get(
-      `${BACKEND_URL}/purchases?seller_id=${auth.userId}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
+    try {
+      const { auth } = getState() as RootState;
+      const token = auth.token;
+      const response = await axios.get(
+        `${BACKEND_URL}/purchases?seller_id=${auth.userId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      return response.data;
+    } catch (err) {
+      let errMsg = (err as any).response?.data?.message;
+      if (errMsg) {
+        throw new Error(errMsg);
       }
-    );
-
-    return response.data;
+      throw err;
+    }
   }
 );
 
