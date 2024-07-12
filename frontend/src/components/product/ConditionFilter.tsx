@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { setSelectedCondition } from "@/store/filterSlice";
-import { fetchItems } from "@/store/itemsSlice";
+import { fetchAvailableItems } from "@/store/itemsSlice";
 import { ItemCondition } from "@/types";
 import { RootState, AppDispatch } from "@/store/store";
 
@@ -30,7 +30,7 @@ const ConditionFilter: React.FC = () => {
         ? null
         : (event.target.value as ItemCondition);
     dispatch(setSelectedCondition(value));
-    dispatch(fetchItems());
+    dispatch(fetchAvailableItems());
   };
   const filterClass =
     selectedCondition === null

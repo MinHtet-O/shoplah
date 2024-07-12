@@ -71,7 +71,9 @@ const ProductDetailSeller: React.FC<ProductDetailSellerProps> = ({
           alignItems: "center",
         }}
       >
-        <h2 className="is-size-4 is-text-grey">{itemError}</h2>
+        <div className="section">
+          <h2 className="is-size-4 is-text-grey">{itemError}</h2>
+        </div>
       </div>
     );
   }

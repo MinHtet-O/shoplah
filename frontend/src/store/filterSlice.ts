@@ -23,10 +23,17 @@ const filterSlice = createSlice({
   initialState,
   reducers: {
     setViewType(state, action: PayloadAction<ViewType>) {
+      localStorage.setItem("viewType", action.payload);
       state.viewType = action.payload;
       state.selectedCategory = null;
       state.selectedCondition = null;
       state.sorting = DEFAULT_SORTING;
+    },
+    loadViewTypeFromLocalStorage: (state) => {
+      const savedViewType = localStorage.getItem("viewType");
+      if (savedViewType) {
+        state.viewType = savedViewType as ViewType;
+      }
     },
     setSelectedCategory(state, action: PayloadAction<number | null>) {
       state.selectedCategory = action.payload;
@@ -45,6 +52,7 @@ export const {
   setSelectedCategory,
   setSelectedCondition,
   setSorting,
+  loadViewTypeFromLocalStorage,
 } = filterSlice.actions;
 
 export default filterSlice.reducer;

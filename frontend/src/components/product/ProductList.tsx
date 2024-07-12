@@ -47,10 +47,12 @@ const ProductList: React.FC<ProductListProps> = ({
           alignItems: "center",
         }}
       >
-        <h2 className="is-size-4">
-          {" "}
-          Error loading items. Please try again later.
-        </h2>
+        <div className="section">
+          <h2 className="is-size-4">
+            {" "}
+            Error loading items. Please try again later.
+          </h2>
+        </div>
       </div>
     );
   }
@@ -64,7 +66,9 @@ const ProductList: React.FC<ProductListProps> = ({
           alignItems: "center",
         }}
       >
-        <h2 className="is-size-4 is-text-grey">No items found!</h2>
+        <div className="section">
+          <h2 className="is-size-4 is-text-grey">No items found!</h2>
+        </div>
       </div>
     );
   }

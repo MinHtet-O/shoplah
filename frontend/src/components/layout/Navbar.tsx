@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import Image from "next/image";
 import Link from "next/link";
@@ -8,9 +8,12 @@ import logo from "../../../public/logo-icon.png";
 import { RootState } from "../../store/store";
 import { logout } from "../../store/authSlice";
 import { AppDispatch } from "../../store/store";
-import { setViewType } from "../../store/filterSlice";
+import {
+  setViewType,
+  loadViewTypeFromLocalStorage,
+} from "../../store/filterSlice";
 import { ViewType } from "@/types";
-import { fetchItems } from "@/store/itemsSlice";
+import { fetchAvailableItems } from "@/store/itemsSlice";
 import { useRouter } from "next/navigation";
 
 interface NavbarProps {
@@ -27,19 +30,23 @@ const Navbar: React.FC<NavbarProps> = ({ onLoginClick, onRegisterClick }) => {
   const pathname = usePathname();
   const router = useRouter();
 
+  useEffect(() => {
+    dispatch(loadViewTypeFromLocalStorage());
+  }, [dispatch]);
+
   const handleLogout = () => {
     dispatch(logout());
   };
 
   const handleShopClick = () => {
     dispatch(setViewType(ViewType.BUY));
-    dispatch(fetchItems());
+    dispatch(fetchAvailableItems());
     router.push("/");
   };
 
   const handleListingsClick = () => {
     dispatch(setViewType(ViewType.SELL));
-    dispatch(fetchItems());
+    dispatch(fetchAvailableItems());
     router.push("/");
   };
 
@@ -65,7 +72,9 @@ const Navbar: React.FC<NavbarProps> = ({ onLoginClick, onRegisterClick }) => {
                 <div className="buttons">
                   <button
                     className={`button ${
-                      viewType === ViewType.BUY ? "is-primary" : ""
+                      pathname === "/" && viewType === ViewType.BUY
+                        ? "is-primary"
+                        : ""
                     }`}
                     onClick={handleShopClick}
                   >
@@ -73,7 +82,9 @@ const Navbar: React.FC<NavbarProps> = ({ onLoginClick, onRegisterClick }) => {
                   </button>
                   <button
                     className={`button ${
-                      viewType === ViewType.SELL ? "is-primary" : ""
+                      pathname === "/" && viewType === ViewType.SELL
+                        ? "is-primary"
+                        : ""
                     }`}
                     onClick={handleListingsClick}
                   >

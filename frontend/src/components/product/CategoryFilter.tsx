@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchCategories } from "@/store/categorysSlice";
 import { setSelectedCategory } from "@/store/filterSlice";
-import { fetchItems } from "@/store/itemsSlice";
+import { fetchAvailableItems } from "@/store/itemsSlice";
 import { Category } from "@/types";
 import { RootState, AppDispatch } from "@/store/store";
 
@@ -37,7 +37,7 @@ const CategoryFilter: React.FC = () => {
     const value =
       event.target.value === "null" ? null : Number(event.target.value);
     dispatch(setSelectedCategory(value));
-    dispatch(fetchItems());
+    dispatch(fetchAvailableItems());
   };
   const filterClass =
     selectedCategory === null

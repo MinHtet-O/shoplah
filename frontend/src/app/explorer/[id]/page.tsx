@@ -71,7 +71,9 @@ const ProductDetailBuyer: React.FC<{ productId: string }> = ({ productId }) => {
           alignItems: "center",
         }}
       >
-        <h2 className="is-size-4 is-text-grey">{error}</h2>
+        <div className="section">
+          <h2 className="is-size-4 is-text-grey">{error}</h2>
+        </div>
       </div>
     );
   }

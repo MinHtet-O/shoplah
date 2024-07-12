@@ -1,6 +1,6 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchItems } from "@/store/itemsSlice";
+import { fetchAvailableItems } from "@/store/itemsSlice";
 import { AppDispatch, RootState } from "@/store/store";
 import { setSorting } from "@/store/filterSlice";
 import { Sorting } from "@/types";
@@ -11,7 +11,7 @@ const Sortings: React.FC = () => {
 
   const handleSortingChange = (sorting: Sorting) => {
     dispatch(setSorting(sorting));
-    dispatch(fetchItems());
+    dispatch(fetchAvailableItems());
   };
 
   const getButtonClass = (sorting: Sorting) => {

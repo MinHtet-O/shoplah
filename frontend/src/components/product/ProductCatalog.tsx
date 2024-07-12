@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import Filters from "./Filters"; // Import the new Filters component
 import Sortings from "./Sortings"; // Import the new Sortings component
 import ProductList from "@/components/product/ProductList";
-import { fetchItems } from "@/store/itemsSlice";
+import { fetchAvailableItems } from "@/store/itemsSlice";
 import { AppDispatch, RootState } from "@/store/store";
 import withAuth from "@/components/auth/withAuth";
 
@@ -22,7 +22,7 @@ const ProductCatalog: React.FC = () => {
   const { loading, error } = useSelector((state: RootState) => state.items);
 
   useEffect(() => {
-    dispatch(fetchItems());
+    dispatch(fetchAvailableItems());
   }, [dispatch, selectedCategory, selectedCondition, userId]);
 
   return (

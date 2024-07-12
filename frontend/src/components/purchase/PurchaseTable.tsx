@@ -34,17 +34,6 @@ const PurchaseTable: React.FC<PurchaseTableProps> = ({ data, onRowClick }) => {
           <tr key={purchase.id} onClick={() => onRowClick(purchase.id)}>
             <td>
               <div className="is-flex is-align-items-center">
-                <figure className="image is-48x48 mr-3">
-                  <Image
-                    src={
-                      purchase.item.image || "https://via.placeholder.com/48"
-                    }
-                    alt={purchase.item.title}
-                    width={48}
-                    height={48}
-                    style={{ objectFit: "cover" }}
-                  />
-                </figure>
                 <p>{purchase.item.title}</p>
               </div>
             </td>

@@ -58,7 +58,7 @@ export const createItem = createAsyncThunk(
     }
   }
 );
-export const fetchItems = createAsyncThunk(
+export const fetchAvailableItems = createAsyncThunk(
   "items/fetchItems",
   async (_, { getState }) => {
     const state = getState() as RootState;
@@ -78,10 +78,10 @@ export const fetchItems = createAsyncThunk(
     }
     if (viewType === ViewType.BUY && userId !== null) {
       params.append("seller_id-ne", userId.toString());
-      params.append("status", ItemStatus.AVAILABLE);
     } else if (viewType === ViewType.SELL && userId !== null) {
       params.append("seller_id", userId.toString());
     }
+    params.append("status", ItemStatus.AVAILABLE);
 
     if (sorting) {
       if (sorting === Sorting.LATEST) {
@@ -160,15 +160,15 @@ const itemsSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(fetchItems.pending, (state) => {
+      .addCase(fetchAvailableItems.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(fetchItems.fulfilled, (state, action) => {
+      .addCase(fetchAvailableItems.fulfilled, (state, action) => {
         state.loading = false;
         state.items = action.payload;
       })
-      .addCase(fetchItems.rejected, (state, action) => {
+      .addCase(fetchAvailableItems.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message || "Failed to fetch items";
       })

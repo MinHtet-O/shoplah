@@ -104,7 +104,7 @@ export class ItemService {
     if (!item) {
       throw new NotFoundError("item not found");
     }
-    const baseFileServerUrl = "http://localhost:8081"; // Replace with your base URL
+    const baseFileServerUrl = "http://localhost:8081";
     if (item.image) {
       item.image = `${baseFileServerUrl}/${item.image}`;
     }
