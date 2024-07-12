@@ -53,10 +53,18 @@ For a local setup, ensure you have PostgreSQL installed and running on `localhos
     npm run install:all
    ```
 
-2. (Optional) Generate test data:
+2. Seed the database with initial data. You have two options:
+
+   Option A: Generate test data including categories, users,items and offers
 
    ```
    cd backend && npm run setup:dev && cd ..
+   ```
+
+   Option B: Seed only categories (start with clean data):
+
+   ```
+   cd backend && npm run seed:categories && cd ..
    ```
 
 3. Start the development server:
