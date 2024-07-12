@@ -41,7 +41,6 @@ As a prerequisite, you need to install Docker and docker-compose. To set up the 
    docker-compose up
    ```
 
-4. Access the application at `http://localhost:3000`
 
 ## Local Setup
 
@@ -73,7 +72,6 @@ For a local setup, ensure you have PostgreSQL installed and running on `localhos
    npm run dev
    ```
 
-4. The application will be accessible at `http://localhost:5432`
 
 ## Testing
 
