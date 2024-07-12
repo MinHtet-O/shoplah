@@ -8,6 +8,8 @@ import {
   getItemConditionTagColor,
   getPurchaseTypeTagColor,
 } from "@/utils/tagColors";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store/store";
 
 interface PurchaseTableProps {
   data: Purchase[];
@@ -23,6 +25,7 @@ const PurchaseTable: React.FC<PurchaseTableProps> = ({ data, onRowClick }) => {
           <th>Condition</th>
           <th>Type</th>
           <th>Price</th>
+          <th>Sales Price</th>
           <th>Seller</th>
           <th>Buyer</th>
           <th>Brand</th>
@@ -55,6 +58,7 @@ const PurchaseTable: React.FC<PurchaseTableProps> = ({ data, onRowClick }) => {
                 {purchase.type.replace("_", " ")}
               </span>
             </td>
+            <td>${purchase.item.price}</td>
             <td>${purchase.price}</td>
             <td>{purchase.seller.username}</td>
             <td>{purchase.buyer.username}</td>
