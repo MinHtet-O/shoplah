@@ -108,7 +108,7 @@ const ProductDetailSeller: React.FC<ProductDetailSellerProps> = ({
                       new Date(product.purchase!.purchased_at),
                       "MMMM d, yyyy 'at' hh:mm a"
                     )}
-                    . <a href="/sales-history">See your sales history</a>
+                    . <a href="/sales">See your sales history</a>
                   </>
                 ) : (
                   <>
@@ -118,7 +118,7 @@ const ProductDetailSeller: React.FC<ProductDetailSellerProps> = ({
                       "MMMM d, yyyy 'at' hh:mm a"
                     )}{" "}
                     for ${product.purchase!.price}.{" "}
-                    <a href="/sales-history">See your sales history</a>
+                    <a href="/sales">See your sales history</a>
                   </>
                 )}
               </div>

@@ -115,7 +115,7 @@ const ProductDetailBuyer: React.FC<{ productId: string }> = ({ productId }) => {
                     )}
                   </>
                 )}
-                . <a href="/purchase-history">See your purchase history</a>
+                . <a href="/purchases">See your purchase history</a>
               </div>
             )}
             {isSold && !isBuyer && (

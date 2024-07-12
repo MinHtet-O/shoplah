@@ -1,5 +1,3 @@
-// File: components/layout/AppLayout.tsx
-
 "use client";
 
 import React, { useState, ReactNode } from "react";
@@ -11,7 +9,8 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import LoginModal from "@/components/auth/LoginModal";
 import RegisterModal from "@/components/auth/RegisterModal";
-
+import { ErrorBoundary } from "react-error-boundary";
+import ErrorFallback from "@/components/error/ErrorFallBack";
 interface AppLayoutProps {
   children: ReactNode;
 }
@@ -21,6 +20,9 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const [isRegisterModalActive, setIsRegisterModalActive] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const dispatch = useDispatch<AppDispatch>();
+  const handleGoToHomePage = () => {
+    window.location.href = "/";
+  };
 
   const handleCloseLoginModal = () => {
     setIsLoginModalActive(false);
@@ -62,7 +64,18 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
         onRegisterClick={() => setIsRegisterModalActive(true)}
       />
       <main>
-        <div style={{ marginTop: "3rem" }}>{children}</div>
+        <div style={{ marginTop: "3rem" }}>
+          <ErrorBoundary
+            FallbackComponent={(props) => (
+              <ErrorFallback
+                {...props}
+                handleGoToHomePage={handleGoToHomePage}
+              />
+            )}
+          >
+            {children}
+          </ErrorBoundary>
+        </div>
       </main>
       <Footer />
       <LoginModal

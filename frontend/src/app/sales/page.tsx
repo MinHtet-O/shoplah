@@ -19,7 +19,7 @@ const SalesHistory: React.FC = () => {
   useEffect(() => {
     dispatch(fetchSales());
   }, [dispatch]);
-
+  throw new Error("gg");
   const handleSaleClick = (saleId: number) => {
     // TODO: implement purchase detail
   };
